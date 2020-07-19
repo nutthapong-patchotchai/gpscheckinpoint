@@ -14,11 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-
+from django.urls import path, include 
+from checkin.serializer.RegisterSerializer import UserRegistrationView as reg
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), 
+    path('api/auth/', include('rest_registration.api.urls')),
+    path('api/auth/register-full/', reg.as_view(), name="rest_name_register"),
+    path('api/', include("checkin.urls")),  
+    
     path('', include("checkin.api.urls")),
    # path('', include("proflie.api.urls"))
 ]

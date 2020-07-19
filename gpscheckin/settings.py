@@ -26,7 +26,7 @@ SECRET_KEY = '0*3m6rtjn-dz(b$i2qkq%*h3nqa%%=s=)xo0j$7wy^no!&j63%'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+SITE_ID = 1
 
 # Application definition
 
@@ -37,7 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+     'django.contrib.sites',
+    'allauth',
+    'allauth.socialaccount',
     'rest_framework',
+    'allauth.account',
+    'rest_framework.authtoken',
+    'rest_auth.registration',
+   
+
     # 'proflie',
     'checkin'
 ]
@@ -87,11 +95,15 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
-         "init_command": "SET foreign_key_checks = 0;",
-    },
+            "init_command": "SET foreign_key_checks = 0;",
+        },
     }
 }
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -111,7 +123,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -124,8 +135,12 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
+REST_REGISTRATION = {
+    'REGISTER_VERIFICATION_ENABLED': False,
+    'RESET_PASSWORD_VERIFICATION_ENABLED': False,
+    'REGISTER_EMAIL_VERIFICATION_ENABLED': False,
+}
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 

@@ -4,10 +4,11 @@ from .models import point, gps
 from .models import Geography, Province  , Amphur ,District ,profile
 from django.contrib.auth.models import User
 
+admin.site.site_header = 'ระบบ อ.ว. การโควิด'
 
 class profileAdmin(admin.ModelAdmin):
     search_fields = ['address']
-    list_display = ('address', 'post','tel')
+    list_display = ('full_name','address', 'post','tel')
 admin.site.register(profile,profileAdmin)
  
 admin.site.register(gps)
