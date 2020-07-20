@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from checkin.models.address import *
 from django.utils.translation import ugettext_lazy as _
+
+
 class gps(models.Model):
     class Meta:
         verbose_name = _("การเช็คอิน")

@@ -23,6 +23,6 @@ urlpatterns = [
     path('api/auth/register-full/', reg.as_view(), name="rest_name_register"),
     path('api/', include("checkin.urls")),  
     
-    path('', include("checkin.api.urls")),
+    # path('', include("checkin.api.urls")),
    # path('', include("proflie.api.urls"))
 ]

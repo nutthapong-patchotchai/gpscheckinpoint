@@ -1,8 +1,8 @@
 from django.urls import path
-from checkin.api.views import (GPSCreateAPIView,
-                               GPSDetailAPIView,
-                               PointCreateAPIView,
-                               PointDetailAPIView)
+from checkin.views.views import (GPSCreateAPIView,
+                                 GPSDetailAPIView,
+                                 PointCreateAPIView,
+                                 PointDetailAPIView)
 
 
 urlpatterns = [
