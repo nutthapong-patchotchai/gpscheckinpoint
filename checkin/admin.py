@@ -17,11 +17,11 @@ class CheckinAdmin(admin.ModelAdmin):
     list_display = ('id', 'full_name','geo_name','province_name','amphur_name','district_name','created_at') 
 admin.site.register(gps,CheckinAdmin)
 
-
-admin.site.register(point) 
-
-
-
+class pointAdmin(admin.ModelAdmin): 
+    search_fields = ['address']
+    list_display = ('full_name','created_at','updated_at')
+admin.site.register(point,pointAdmin) 
+ 
 class GeographyAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_display = ('id', 'name')

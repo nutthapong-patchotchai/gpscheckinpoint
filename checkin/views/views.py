@@ -53,6 +53,12 @@ class PointDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = point.objects.all()
     serializer_class = PointSerializer
 
+class PointUserDetailAPIView(APIView): 
+    def get(self, request,pk, format=None):
+        queryset = point.objects.filter(user__id=pk).order_by('-updated_at')
+        serializer = PointSerializer(queryset,many=True) 
+        return Response(serializer.data)
+
 class GeoCreateAPIView(generics.ListCreateAPIView):
     queryset = Geography.objects.all()
     serializer_class = GeographySerializer

@@ -29,7 +29,7 @@ class PointSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = point
-        exclude = ("id",)
+        fields = ('__all__')
 
 class GeographySerializer(serializers.ModelSerializer): 
     class Meta:

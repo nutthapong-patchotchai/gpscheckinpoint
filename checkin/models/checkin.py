@@ -52,3 +52,7 @@ class point(models.Model):
     status = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def full_name(self):
+        return "%s %s"%(self.user.first_name, self.user.last_name)
