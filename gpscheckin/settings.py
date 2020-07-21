@@ -31,8 +31,11 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    'jet.dashboard',
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
+    'corsheaders',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -44,8 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_framework.authtoken',
     'rest_auth.registration',
-   
-
+    
     # 'proflie',
     'checkin'
 ]
@@ -58,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
 ]
 
 ROOT_URLCONF = 'gpscheckin.urls'
@@ -77,26 +80,58 @@ TEMPLATES = [
         },
     },
 ]
-
+JET_THEMES = [
+    {
+        'theme': 'default', # theme folder name
+        'color': '#47bac1', # color of the theme's button in user menu
+        'title': 'Default' # theme title
+    },
+    {
+        'theme': 'green',
+        'color': '#44b78b',
+        'title': 'Green'
+    },
+    {
+        'theme': 'light-green',
+        'color': '#2faa60',
+        'title': 'Light Green'
+    },
+    {
+        'theme': 'light-violet',
+        'color': '#a464c4',
+        'title': 'Light Violet'
+    },
+    {
+        'theme': 'light-blue',
+        'color': '#5EADDE',
+        'title': 'Light Blue'
+    },
+    {
+        'theme': 'light-gray',
+        'color': '#222',
+        'title': 'Light Gray'
+    }
+]
 WSGI_APPLICATION = 'gpscheckin.wsgi.application'
 
-
+CORS_ORIGIN_ALLOW_ALL = True
+ 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-         'ENGINE': 'django.db.backends.sqlite3',
-         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-       #'ENGINE': 'django.db.backends.mysql',
-       #'NAME': 'checkin',
-       #'USER': 'root',
-       #'PASSWORD': 'password1234',
-       #'HOST': 'localhost',
-       #'PORT': '3306',
-       #'OPTIONS': {
-        #    "init_command": "SET foreign_key_checks = 0;",
-       #},
+        #  'ENGINE': 'django.db.backends.sqlite3',
+        #  'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'checkin',
+        'USER': 'root',
+        'PASSWORD': 'password1234',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        },
     }
 }
 REST_FRAMEWORK = {
@@ -144,4 +179,16 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+MEDIA_ROOT= os.path.join(BASE_DIR, 'media/')
+MEDIA_URL= "/media/"
+UP_AUTH ={
+    "GRANT_TYPE":'authorization_code',
+    "SECRET_KEY" : 'CFE61x9G~VUV3.-n_Spr-oYZ-0XG7Gp1pZ',
+    "CLIENT_ID" : 'b00621f8-cf21-4368-82b2-04867fa0af77',
+    "TENANT_ID" : 'd7cbbb08-47a3-4bd7-8347-5018f2744cfb',
+    "SCOPE":["User.Read","profile"]
+}
+AUTH_URL = "https://login.microsoftonline.com/"+UP_AUTH['TENANT_ID']+"/oauth2/v2.0/token"
+AUTH_PROFILE_URL = "https://graph.microsoft.com/beta/me?$select=givenName,surname,department,id,officeLocation,mail,displayName"

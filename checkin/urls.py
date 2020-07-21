@@ -2,7 +2,13 @@ from django.urls import path
 from checkin.views.views import (GPSCreateAPIView, GPSDetailAPIView,
                                  PointCreateAPIView, PointDetailAPIView,
                                  UserCreateAPIView, UserDetailAPIView,
-                                 ProfileCreateAPIView, ProfileDetailAPIView)
+                                 ProfileCreateAPIView, ProfileDetailAPIView,
+                                 GeoCreateAPIView, GeoDetailAPIView,
+                                 ProvinceCreateAPIView, ProvinceDetailAPIView, 
+                                 AmphurCreateAPIView, AmphurDetailAPIView,
+                                 DistrictCreateAPIView, DistrictDetailAPIView, ProfileFullDetailAPIView,
+                                 DistrictAllDetailAPIView,ProvinceFullDetailAPIView
+                                 )
 
 
 urlpatterns = [
@@ -14,5 +20,16 @@ urlpatterns = [
     path("user/<int:pk>/edit", UserDetailAPIView.as_view(), name='user-detail'),
     path("profile/", ProfileCreateAPIView.as_view(), name='profile'),
     path("profile/<int:pk>/", ProfileDetailAPIView.as_view(), name='profile-detail'),
-
+    path("geo/", GeoCreateAPIView.as_view(), name='profile'),
+    path("geo/<int:pk>/", GeoDetailAPIView.as_view(), name='profile-detail'),
+    path("province/", ProvinceCreateAPIView.as_view(), name='province'),
+    path("province/<int:pk>/", ProvinceDetailAPIView.as_view(), name='province-detail'),
+    path("amphur/", AmphurCreateAPIView.as_view(), name='amphur'),
+    path("amphur/<int:pk>/", AmphurDetailAPIView.as_view(), name='amphur-detail'),
+    path("district/", DistrictCreateAPIView.as_view(), name='district'),
+    path("district/<int:pk>/", DistrictDetailAPIView.as_view(), name='district-detail'),
+    path("profilefull/<int:pk>/", ProfileFullDetailAPIView.as_view(), name='profilefull-detail'),
+    path("districtfull/<int:pk>/", DistrictAllDetailAPIView.as_view(), name='districtfull-detail'),
+    path("provincesearch/", ProvinceFullDetailAPIView.as_view(), name='provinprovincesearchce'),
+     
 ]

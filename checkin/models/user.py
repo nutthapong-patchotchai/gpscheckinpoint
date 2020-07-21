@@ -25,3 +25,4 @@ class profile(models.Model):
     @property
     def full_name(self):
         return "%s %s"%(self.user.first_name, self.user.last_name)
+  

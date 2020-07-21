@@ -14,7 +14,8 @@ class gps(models.Model):
     longitude = models.TextField(blank=True, null=True, default=0)
     geo = models.ForeignKey(Geography, on_delete=models.CASCADE , blank=True, null=True)
     amphur = models.ForeignKey(Amphur, on_delete=models.CASCADE , blank=True, null=True )
-    province = models.ForeignKey(Province, on_delete=models.CASCADE, blank=True, null=True) 
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, blank=True, null=True)
+    district = models.ForeignKey(District, on_delete=models.CASCADE, blank=True, null=True)  
     sick1 = models.IntegerField(default=0)
     sick2 = models.IntegerField(default=0)
     sick3 = models.IntegerField(default=0)
@@ -24,7 +25,17 @@ class gps(models.Model):
     sick7 = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    @property
+    def full_name(self):
+        return "%s %s"%(self.user.first_name, self.user.last_name)
+    def geo_name(self):
+        return "%s"%(self.geo.name)
+    def province_name(self):
+        return "%s"%(self.province.name)
+    def amphur_name(self):
+        return "%s"%(self.amphur.name)
+    def district_name(self):
+        return "%s"%(self.district)
 
 class point(models.Model):
     class Meta:

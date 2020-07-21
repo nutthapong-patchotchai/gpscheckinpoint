@@ -11,7 +11,13 @@ class profileAdmin(admin.ModelAdmin):
     list_display = ('full_name','address', 'post','tel')
 admin.site.register(profile,profileAdmin)
  
-admin.site.register(gps)
+class CheckinAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['province','amphur','district']
+    search_fields = ['user__first_name','user__last_name','province__name','amphur__name','district__name','geo__name','created_at']
+    list_display = ('id', 'full_name','geo_name','province_name','amphur_name','district_name','created_at') 
+admin.site.register(gps,CheckinAdmin)
+
+
 admin.site.register(point) 
 
 

@@ -50,7 +50,7 @@ class District(models.Model):
     province = models.ForeignKey(Province, on_delete=models.CASCADE)
     geo = models.ForeignKey(Geography, on_delete=models.CASCADE)
     def __str__(self):
-        return '{}'.format(self.name)
+        return '{} > {} > {}'.format(self.name, self.amphur.name, self.province.name)
 
 
 
