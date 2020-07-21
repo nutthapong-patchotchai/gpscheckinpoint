@@ -18,9 +18,7 @@ from django.urls import path, include
 from checkin.serializer.RegisterSerializer import UserRegistrationView as reg
 from checkin.views.auth365 import Callback
 
-urlpatterns = [
-    path("jet/", include('jet.urls', 'jet')),
-    path("jet/dashboard/", include('jet.dashboard.urls', 'jet-dashboard')),
+urlpatterns = [ 
     path('admin/', admin.site.urls), 
     path('api/auth/', include('rest_registration.api.urls')),
     path('api/auth/register-full/', reg.as_view(), name="rest_name_register"),
