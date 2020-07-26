@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from checkin.models.address import *
 from django.utils.translation import ugettext_lazy as _
+ 
+
+def get_first_name(self):
+    return "%s %s"%(self.first_name, self.last_name)
+User.add_to_class("__str__", get_first_name)
 
 class profile(models.Model):
     class Meta:
@@ -24,5 +29,13 @@ class profile(models.Model):
 
     @property
     def full_name(self):
-        return "%s %s"%(self.user.first_name, self.user.last_name)
+        return "%s %s"%(self.user.first_name, self.user.last_name) 
+    def geo_name(self):
+        return "%s"%(self.geo.name)
+    def province_name(self):
+        return "%s"%(self.province.name)
+    def amphur_name(self):
+        return "%s"%(self.amphur.name)
+    def district_name(self):
+        return "%s"%(self.district)
   

@@ -8,7 +8,7 @@ admin.site.site_header = 'ระบบ อ.ว. การโควิด'
 
 class profileAdmin(admin.ModelAdmin):
     search_fields = ['address']
-    list_display = ('full_name','address', 'post','tel')
+    list_display = ('full_name','address','province_name','amphur_name','district_name', 'post','tel')
 admin.site.register(profile,profileAdmin)
  
 class CheckinAdmin(admin.ModelAdmin):

@@ -12,10 +12,10 @@ class gps(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     latitude = models.TextField(blank=True, null=True, default=0)
     longitude = models.TextField(blank=True, null=True, default=0)
-    # geo = models.ForeignKey(Geography, on_delete=models.CASCADE , blank=True, null=True)
-    # amphur = models.ForeignKey(Amphur, on_delete=models.CASCADE , blank=True, null=True )
-    # province = models.ForeignKey(Province, on_delete=models.CASCADE, blank=True, null=True)
-    # district = models.ForeignKey(District, on_delete=models.CASCADE, blank=True, null=True)
+    geo = models.ForeignKey(Geography, on_delete=models.CASCADE , blank=True, null=True)
+    amphur = models.ForeignKey(Amphur, on_delete=models.CASCADE , blank=True, null=True )
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, blank=True, null=True)
+    district = models.ForeignKey(District, on_delete=models.CASCADE, blank=True, null=True)  
     sick1 = models.IntegerField(default=0)
     sick2 = models.IntegerField(default=0)
     sick3 = models.IntegerField(default=0)
@@ -28,14 +28,26 @@ class gps(models.Model):
     @property
     def full_name(self):
         return "%s %s"%(self.user.first_name, self.user.last_name)
-    # def geo_name(self):
-    #     return "%s"%(self.geo.name)
-    # def province_name(self):
-    #     return "%s"%(self.province.name)
-    # def amphur_name(self):
-    #     return "%s"%(self.amphur.name)
-    # def district_name(self):
-    #     return "%s"%(self.district)
+    def geo_name(self):
+        try:
+          return "%s"%(self.geo.name)
+        except:
+          return "-"  
+    def province_name(self):
+        try:
+          return "%s"%(self.province.name)
+        except:
+          return "-"   
+    def amphur_name(self):
+        try:
+          return "%s"%(self.amphur.name)
+        except:
+          return "-"   
+    def district_name(self):
+        try:
+          return "%s"%(self.district.name)
+        except:
+          return "-" 
 
 class point(models.Model):
     class Meta:

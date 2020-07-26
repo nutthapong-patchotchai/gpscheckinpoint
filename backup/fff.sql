@@ -5,17 +5,326 @@
  Source Server Type    : MySQL
  Source Server Version : 80019
  Source Host           : localhost:3306
- Source Schema         : address
+ Source Schema         : checkin
 
  Target Server Type    : MySQL
  Target Server Version : 80019
  File Encoding         : 65001
 
- Date: 18/07/2020 16:13:53
+ Date: 21/07/2020 17:51:01
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for account_emailaddress
+-- ----------------------------
+DROP TABLE IF EXISTS `account_emailaddress`;
+CREATE TABLE `account_emailaddress` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(254) NOT NULL,
+  `verified` tinyint(1) NOT NULL,
+  `primary` tinyint(1) NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `account_emailaddress_user_id_2c513194_fk_auth_user_id` (`user_id`),
+  CONSTRAINT `account_emailaddress_user_id_2c513194_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for account_emailconfirmation
+-- ----------------------------
+DROP TABLE IF EXISTS `account_emailconfirmation`;
+CREATE TABLE `account_emailconfirmation` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `created` datetime(6) NOT NULL,
+  `sent` datetime(6) DEFAULT NULL,
+  `key` varchar(64) NOT NULL,
+  `email_address_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`),
+  KEY `account_emailconfirm_email_address_id_5b7f8c58_fk_account_e` (`email_address_id`),
+  CONSTRAINT `account_emailconfirm_email_address_id_5b7f8c58_fk_account_e` FOREIGN KEY (`email_address_id`) REFERENCES `account_emailaddress` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for admin_interface_theme
+-- ----------------------------
+DROP TABLE IF EXISTS `admin_interface_theme`;
+CREATE TABLE `admin_interface_theme` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `title` varchar(50) NOT NULL,
+  `title_visible` tinyint(1) NOT NULL,
+  `logo` varchar(100) NOT NULL,
+  `logo_visible` tinyint(1) NOT NULL,
+  `css_header_background_color` varchar(10) NOT NULL,
+  `title_color` varchar(10) NOT NULL,
+  `css_header_text_color` varchar(10) NOT NULL,
+  `css_header_link_color` varchar(10) NOT NULL,
+  `css_header_link_hover_color` varchar(10) NOT NULL,
+  `css_module_background_color` varchar(10) NOT NULL,
+  `css_module_text_color` varchar(10) NOT NULL,
+  `css_module_link_color` varchar(10) NOT NULL,
+  `css_module_link_hover_color` varchar(10) NOT NULL,
+  `css_module_rounded_corners` tinyint(1) NOT NULL,
+  `css_generic_link_color` varchar(10) NOT NULL,
+  `css_generic_link_hover_color` varchar(10) NOT NULL,
+  `css_save_button_background_color` varchar(10) NOT NULL,
+  `css_save_button_background_hover_color` varchar(10) NOT NULL,
+  `css_save_button_text_color` varchar(10) NOT NULL,
+  `css_delete_button_background_color` varchar(10) NOT NULL,
+  `css_delete_button_background_hover_color` varchar(10) NOT NULL,
+  `css_delete_button_text_color` varchar(10) NOT NULL,
+  `css` longtext NOT NULL,
+  `list_filter_dropdown` tinyint(1) NOT NULL,
+  `related_modal_active` tinyint(1) NOT NULL,
+  `related_modal_background_color` varchar(10) NOT NULL,
+  `related_modal_rounded_corners` tinyint(1) NOT NULL,
+  `logo_color` varchar(10) NOT NULL,
+  `recent_actions_visible` tinyint(1) NOT NULL,
+  `favicon` varchar(100) NOT NULL,
+  `related_modal_background_opacity` varchar(5) NOT NULL,
+  `env_name` varchar(50) NOT NULL,
+  `env_visible_in_header` tinyint(1) NOT NULL,
+  `env_color` varchar(10) NOT NULL,
+  `env_visible_in_favicon` tinyint(1) NOT NULL,
+  `related_modal_close_button_visible` tinyint(1) NOT NULL,
+  `language_chooser_active` tinyint(1) NOT NULL,
+  `language_chooser_display` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `admin_interface_theme_name_30bda70f_uniq` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of admin_interface_theme
+-- ----------------------------
+BEGIN;
+INSERT INTO `admin_interface_theme` VALUES (1, 'ระบบติดตาม นิสิต', 1, 'ระบบติดตาม นิสิต', 1, 'admin-interface/logo/member-04-up.png', 1, '#560E7B', '#F5DD5D', '#CBAFD7', '#FFFFFF', '#560E7B', '#582DC7', '#FFFFFF', '#FFFFFF', '#E993F0', 1, '#0C3C26', '#156641', '#560E7B', '#86218B', '#FFFFFF', '#BA2121', '#A41515', '#FFFFFF', '', 0, 1, '#560E7B', 1, '#FFFFFF', 1, 'admin-interface/favicon/member-04-up.png', '0.3', 'ระบบติดตาม นิสิต', 1, '#560E7B', 1, 1, 1, 'name');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for auth_group
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_group`;
+CREATE TABLE `auth_group` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for auth_group_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_group_permissions`;
+CREATE TABLE `auth_group_permissions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `group_id` int NOT NULL,
+  `permission_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `auth_group_permissions_group_id_permission_id_0cd325b0_uniq` (`group_id`,`permission_id`),
+  KEY `auth_group_permissio_permission_id_84c5c92e_fk_auth_perm` (`permission_id`),
+  CONSTRAINT `auth_group_permissio_permission_id_84c5c92e_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`),
+  CONSTRAINT `auth_group_permissions_group_id_b120cbf9_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for auth_permission
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_permission`;
+CREATE TABLE `auth_permission` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `content_type_id` int NOT NULL,
+  `codename` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
+  CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=97 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of auth_permission
+-- ----------------------------
+BEGIN;
+INSERT INTO `auth_permission` VALUES (1, 'Can add log entry', 1, 'add_logentry');
+INSERT INTO `auth_permission` VALUES (2, 'Can change log entry', 1, 'change_logentry');
+INSERT INTO `auth_permission` VALUES (3, 'Can delete log entry', 1, 'delete_logentry');
+INSERT INTO `auth_permission` VALUES (4, 'Can view log entry', 1, 'view_logentry');
+INSERT INTO `auth_permission` VALUES (5, 'Can add permission', 2, 'add_permission');
+INSERT INTO `auth_permission` VALUES (6, 'Can change permission', 2, 'change_permission');
+INSERT INTO `auth_permission` VALUES (7, 'Can delete permission', 2, 'delete_permission');
+INSERT INTO `auth_permission` VALUES (8, 'Can view permission', 2, 'view_permission');
+INSERT INTO `auth_permission` VALUES (9, 'Can add group', 3, 'add_group');
+INSERT INTO `auth_permission` VALUES (10, 'Can change group', 3, 'change_group');
+INSERT INTO `auth_permission` VALUES (11, 'Can delete group', 3, 'delete_group');
+INSERT INTO `auth_permission` VALUES (12, 'Can view group', 3, 'view_group');
+INSERT INTO `auth_permission` VALUES (13, 'Can add user', 4, 'add_user');
+INSERT INTO `auth_permission` VALUES (14, 'Can change user', 4, 'change_user');
+INSERT INTO `auth_permission` VALUES (15, 'Can delete user', 4, 'delete_user');
+INSERT INTO `auth_permission` VALUES (16, 'Can view user', 4, 'view_user');
+INSERT INTO `auth_permission` VALUES (17, 'Can add content type', 5, 'add_contenttype');
+INSERT INTO `auth_permission` VALUES (18, 'Can change content type', 5, 'change_contenttype');
+INSERT INTO `auth_permission` VALUES (19, 'Can delete content type', 5, 'delete_contenttype');
+INSERT INTO `auth_permission` VALUES (20, 'Can view content type', 5, 'view_contenttype');
+INSERT INTO `auth_permission` VALUES (21, 'Can add session', 6, 'add_session');
+INSERT INTO `auth_permission` VALUES (22, 'Can change session', 6, 'change_session');
+INSERT INTO `auth_permission` VALUES (23, 'Can delete session', 6, 'delete_session');
+INSERT INTO `auth_permission` VALUES (24, 'Can view session', 6, 'view_session');
+INSERT INTO `auth_permission` VALUES (25, 'Can add site', 7, 'add_site');
+INSERT INTO `auth_permission` VALUES (26, 'Can change site', 7, 'change_site');
+INSERT INTO `auth_permission` VALUES (27, 'Can delete site', 7, 'delete_site');
+INSERT INTO `auth_permission` VALUES (28, 'Can view site', 7, 'view_site');
+INSERT INTO `auth_permission` VALUES (29, 'Can add social account', 8, 'add_socialaccount');
+INSERT INTO `auth_permission` VALUES (30, 'Can change social account', 8, 'change_socialaccount');
+INSERT INTO `auth_permission` VALUES (31, 'Can delete social account', 8, 'delete_socialaccount');
+INSERT INTO `auth_permission` VALUES (32, 'Can view social account', 8, 'view_socialaccount');
+INSERT INTO `auth_permission` VALUES (33, 'Can add social application', 9, 'add_socialapp');
+INSERT INTO `auth_permission` VALUES (34, 'Can change social application', 9, 'change_socialapp');
+INSERT INTO `auth_permission` VALUES (35, 'Can delete social application', 9, 'delete_socialapp');
+INSERT INTO `auth_permission` VALUES (36, 'Can view social application', 9, 'view_socialapp');
+INSERT INTO `auth_permission` VALUES (37, 'Can add social application token', 10, 'add_socialtoken');
+INSERT INTO `auth_permission` VALUES (38, 'Can change social application token', 10, 'change_socialtoken');
+INSERT INTO `auth_permission` VALUES (39, 'Can delete social application token', 10, 'delete_socialtoken');
+INSERT INTO `auth_permission` VALUES (40, 'Can view social application token', 10, 'view_socialtoken');
+INSERT INTO `auth_permission` VALUES (41, 'Can add email address', 11, 'add_emailaddress');
+INSERT INTO `auth_permission` VALUES (42, 'Can change email address', 11, 'change_emailaddress');
+INSERT INTO `auth_permission` VALUES (43, 'Can delete email address', 11, 'delete_emailaddress');
+INSERT INTO `auth_permission` VALUES (44, 'Can view email address', 11, 'view_emailaddress');
+INSERT INTO `auth_permission` VALUES (45, 'Can add email confirmation', 12, 'add_emailconfirmation');
+INSERT INTO `auth_permission` VALUES (46, 'Can change email confirmation', 12, 'change_emailconfirmation');
+INSERT INTO `auth_permission` VALUES (47, 'Can delete email confirmation', 12, 'delete_emailconfirmation');
+INSERT INTO `auth_permission` VALUES (48, 'Can view email confirmation', 12, 'view_emailconfirmation');
+INSERT INTO `auth_permission` VALUES (49, 'Can add Token', 13, 'add_token');
+INSERT INTO `auth_permission` VALUES (50, 'Can change Token', 13, 'change_token');
+INSERT INTO `auth_permission` VALUES (51, 'Can delete Token', 13, 'delete_token');
+INSERT INTO `auth_permission` VALUES (52, 'Can view Token', 13, 'view_token');
+INSERT INTO `auth_permission` VALUES (53, 'Can add อำเภอ', 14, 'add_amphur');
+INSERT INTO `auth_permission` VALUES (54, 'Can change อำเภอ', 14, 'change_amphur');
+INSERT INTO `auth_permission` VALUES (55, 'Can delete อำเภอ', 14, 'delete_amphur');
+INSERT INTO `auth_permission` VALUES (56, 'Can view อำเภอ', 14, 'view_amphur');
+INSERT INTO `auth_permission` VALUES (57, 'Can add ตำบล', 15, 'add_district');
+INSERT INTO `auth_permission` VALUES (58, 'Can change ตำบล', 15, 'change_district');
+INSERT INTO `auth_permission` VALUES (59, 'Can delete ตำบล', 15, 'delete_district');
+INSERT INTO `auth_permission` VALUES (60, 'Can view ตำบล', 15, 'view_district');
+INSERT INTO `auth_permission` VALUES (61, 'Can add ภูมิภาค', 16, 'add_geography');
+INSERT INTO `auth_permission` VALUES (62, 'Can change ภูมิภาค', 16, 'change_geography');
+INSERT INTO `auth_permission` VALUES (63, 'Can delete ภูมิภาค', 16, 'delete_geography');
+INSERT INTO `auth_permission` VALUES (64, 'Can view ภูมิภาค', 16, 'view_geography');
+INSERT INTO `auth_permission` VALUES (65, 'Can add จังหวัด', 17, 'add_province');
+INSERT INTO `auth_permission` VALUES (66, 'Can change จังหวัด', 17, 'change_province');
+INSERT INTO `auth_permission` VALUES (67, 'Can delete จังหวัด', 17, 'delete_province');
+INSERT INTO `auth_permission` VALUES (68, 'Can view จังหวัด', 17, 'view_province');
+INSERT INTO `auth_permission` VALUES (69, 'Can add โปรไฟล์', 18, 'add_profile');
+INSERT INTO `auth_permission` VALUES (70, 'Can change โปรไฟล์', 18, 'change_profile');
+INSERT INTO `auth_permission` VALUES (71, 'Can delete โปรไฟล์', 18, 'delete_profile');
+INSERT INTO `auth_permission` VALUES (72, 'Can view โปรไฟล์', 18, 'view_profile');
+INSERT INTO `auth_permission` VALUES (73, 'Can add แต้มสะสม', 19, 'add_point');
+INSERT INTO `auth_permission` VALUES (74, 'Can change แต้มสะสม', 19, 'change_point');
+INSERT INTO `auth_permission` VALUES (75, 'Can delete แต้มสะสม', 19, 'delete_point');
+INSERT INTO `auth_permission` VALUES (76, 'Can view แต้มสะสม', 19, 'view_point');
+INSERT INTO `auth_permission` VALUES (77, 'Can add การเช็คอิน', 20, 'add_gps');
+INSERT INTO `auth_permission` VALUES (78, 'Can change การเช็คอิน', 20, 'change_gps');
+INSERT INTO `auth_permission` VALUES (79, 'Can delete การเช็คอิน', 20, 'delete_gps');
+INSERT INTO `auth_permission` VALUES (80, 'Can view การเช็คอิน', 20, 'view_gps');
+INSERT INTO `auth_permission` VALUES (81, 'Can add bookmark', 21, 'add_bookmark');
+INSERT INTO `auth_permission` VALUES (82, 'Can change bookmark', 21, 'change_bookmark');
+INSERT INTO `auth_permission` VALUES (83, 'Can delete bookmark', 21, 'delete_bookmark');
+INSERT INTO `auth_permission` VALUES (84, 'Can view bookmark', 21, 'view_bookmark');
+INSERT INTO `auth_permission` VALUES (85, 'Can add pinned application', 22, 'add_pinnedapplication');
+INSERT INTO `auth_permission` VALUES (86, 'Can change pinned application', 22, 'change_pinnedapplication');
+INSERT INTO `auth_permission` VALUES (87, 'Can delete pinned application', 22, 'delete_pinnedapplication');
+INSERT INTO `auth_permission` VALUES (88, 'Can view pinned application', 22, 'view_pinnedapplication');
+INSERT INTO `auth_permission` VALUES (89, 'Can add user dashboard module', 23, 'add_userdashboardmodule');
+INSERT INTO `auth_permission` VALUES (90, 'Can change user dashboard module', 23, 'change_userdashboardmodule');
+INSERT INTO `auth_permission` VALUES (91, 'Can delete user dashboard module', 23, 'delete_userdashboardmodule');
+INSERT INTO `auth_permission` VALUES (92, 'Can view user dashboard module', 23, 'view_userdashboardmodule');
+INSERT INTO `auth_permission` VALUES (93, 'Can add Theme', 24, 'add_theme');
+INSERT INTO `auth_permission` VALUES (94, 'Can change Theme', 24, 'change_theme');
+INSERT INTO `auth_permission` VALUES (95, 'Can delete Theme', 24, 'delete_theme');
+INSERT INTO `auth_permission` VALUES (96, 'Can view Theme', 24, 'view_theme');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for auth_user
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_user`;
+CREATE TABLE `auth_user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `password` varchar(128) NOT NULL,
+  `last_login` datetime(6) DEFAULT NULL,
+  `is_superuser` tinyint(1) NOT NULL,
+  `username` varchar(150) NOT NULL,
+  `first_name` varchar(30) NOT NULL,
+  `last_name` varchar(150) NOT NULL,
+  `email` varchar(254) NOT NULL,
+  `is_staff` tinyint(1) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `date_joined` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of auth_user
+-- ----------------------------
+BEGIN;
+INSERT INTO `auth_user` VALUES (1, 'pbkdf2_sha256$180000$5jLjyM6HIwmH$jXozPWwFbacTFpHwtMipNy9AGPbA1unV8fgvLUPz4HM=', '2020-07-21 01:59:33.985409', 1, 'root', '', '', 'root@root.com', 1, 1, '2020-07-21 00:47:35.588775');
+INSERT INTO `auth_user` VALUES (3, 'pbkdf2_sha256$180000$5FWGgI20pgWo$blVYuLx3p2I4VigHxiLN1+82nmxMgz0bzLw8AnbZDrE=', NULL, 0, 'dcc7bbd3-d14b-4506-939a-d792e07f3869', 'มงคล', 'มณีวรรณ์', '57022433@up.ac.th', 0, 1, '2020-07-21 00:50:01.947060');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for auth_user_groups
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_user_groups`;
+CREATE TABLE `auth_user_groups` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `group_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `auth_user_groups_user_id_group_id_94350c0c_uniq` (`user_id`,`group_id`),
+  KEY `auth_user_groups_group_id_97559544_fk_auth_group_id` (`group_id`),
+  CONSTRAINT `auth_user_groups_group_id_97559544_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`),
+  CONSTRAINT `auth_user_groups_user_id_6a12ed8b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for auth_user_user_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_user_user_permissions`;
+CREATE TABLE `auth_user_user_permissions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `permission_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `auth_user_user_permissions_user_id_permission_id_14a6b632_uniq` (`user_id`,`permission_id`),
+  KEY `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm` (`permission_id`),
+  CONSTRAINT `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`),
+  CONSTRAINT `auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for authtoken_token
+-- ----------------------------
+DROP TABLE IF EXISTS `authtoken_token`;
+CREATE TABLE `authtoken_token` (
+  `key` varchar(40) NOT NULL,
+  `created` datetime(6) NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`key`),
+  UNIQUE KEY `user_id` (`user_id`),
+  CONSTRAINT `authtoken_token_user_id_35299eff_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of authtoken_token
+-- ----------------------------
+BEGIN;
+INSERT INTO `authtoken_token` VALUES ('5c0ffbec3e8f08335333f76df713df1705a66e02', '2020-07-21 00:50:02.151491', 3);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for checkin_amphur
@@ -9937,6 +10246,118 @@ INSERT INTO `checkin_geography` VALUES (6, 'ภาคใต้');
 COMMIT;
 
 -- ----------------------------
+-- Table structure for checkin_gps
+-- ----------------------------
+DROP TABLE IF EXISTS `checkin_gps`;
+CREATE TABLE `checkin_gps` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `latitude` longtext,
+  `longitude` longtext,
+  `sick1` int NOT NULL,
+  `sick2` int NOT NULL,
+  `sick3` int NOT NULL,
+  `sick4` int NOT NULL,
+  `sick5` int NOT NULL,
+  `sick6` int NOT NULL,
+  `sick7` int NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `amphur_id` int DEFAULT NULL,
+  `district_id` int DEFAULT NULL,
+  `geo_id` int DEFAULT NULL,
+  `province_id` int DEFAULT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `checkin_gps_amphur_id_2d22a5d9_fk_checkin_amphur_id` (`amphur_id`),
+  KEY `checkin_gps_district_id_87a12c05_fk_checkin_district_id` (`district_id`),
+  KEY `checkin_gps_geo_id_0d8a88d9_fk_checkin_geography_id` (`geo_id`),
+  KEY `checkin_gps_province_id_202289d2_fk_checkin_province_id` (`province_id`),
+  KEY `checkin_gps_user_id_61dd06f9_fk_auth_user_id` (`user_id`),
+  CONSTRAINT `checkin_gps_amphur_id_2d22a5d9_fk_checkin_amphur_id` FOREIGN KEY (`amphur_id`) REFERENCES `checkin_amphur` (`id`),
+  CONSTRAINT `checkin_gps_district_id_87a12c05_fk_checkin_district_id` FOREIGN KEY (`district_id`) REFERENCES `checkin_district` (`id`),
+  CONSTRAINT `checkin_gps_geo_id_0d8a88d9_fk_checkin_geography_id` FOREIGN KEY (`geo_id`) REFERENCES `checkin_geography` (`id`),
+  CONSTRAINT `checkin_gps_province_id_202289d2_fk_checkin_province_id` FOREIGN KEY (`province_id`) REFERENCES `checkin_province` (`id`),
+  CONSTRAINT `checkin_gps_user_id_61dd06f9_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of checkin_gps
+-- ----------------------------
+BEGIN;
+INSERT INTO `checkin_gps` VALUES (1, '19.0283776', '99.9325696', 0, 0, 0, 0, 0, 0, 0, '2020-07-21 00:50:46.724634', '2020-07-21 01:06:05.466059', 712, 6338, 2, 49, 3);
+INSERT INTO `checkin_gps` VALUES (2, '19.0283776', '99.9325696', 0, 0, 0, 0, 0, 0, 0, '2020-07-21 00:54:57.482358', '2020-07-21 10:33:05.646267', 648, 5806, 2, 44, 3);
+INSERT INTO `checkin_gps` VALUES (3, '19.0283776', '99.9325696', 0, 0, 0, 0, 0, 0, 0, '2020-07-21 02:06:14.908255', '2020-07-21 02:06:14.908312', 648, 5806, 1, 44, 3);
+INSERT INTO `checkin_gps` VALUES (4, '19.0283776', '99.9325696', 0, 0, 0, 0, 0, 0, 0, '2020-07-21 02:25:09.162016', '2020-07-21 02:25:09.162654', 648, 5806, 1, 44, 3);
+INSERT INTO `checkin_gps` VALUES (5, '19.0283776', '99.9325696', 0, 1, 0, 1, 1, 0, 0, '2020-07-21 02:30:45.512570', '2020-07-21 02:30:45.512641', 648, 5806, 1, 44, 3);
+INSERT INTO `checkin_gps` VALUES (6, '19.0283776', '99.9325696', 0, 0, 0, 0, 0, 0, 1, '2020-07-21 02:32:16.107631', '2020-07-21 02:32:16.107693', 648, 5806, 1, 44, 3);
+INSERT INTO `checkin_gps` VALUES (7, '19.0283776', '99.9325696', 0, 0, 0, 0, 0, 0, 1, '2020-07-19 02:34:13.448912', '2020-07-19 02:34:13.448952', 648, 5806, 1, 44, 3);
+INSERT INTO `checkin_gps` VALUES (8, '19.0283776', '99.9325696', 0, 0, 1, 1, 1, 0, 0, '2020-07-19 08:53:59.257966', '2020-07-19 08:53:59.258007', 648, 5806, 1, 44, 3);
+INSERT INTO `checkin_gps` VALUES (9, '19.0283776', '99.9325696', 0, 0, 0, 0, 0, 0, 0, '2020-07-21 10:22:05.778087', '2020-07-21 10:22:05.778122', 648, 5806, 1, 44, 3);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for checkin_point
+-- ----------------------------
+DROP TABLE IF EXISTS `checkin_point`;
+CREATE TABLE `checkin_point` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `points` double DEFAULT NULL,
+  `points2` double DEFAULT NULL,
+  `points3` double DEFAULT NULL,
+  `points4` double DEFAULT NULL,
+  `points5` double DEFAULT NULL,
+  `points6` double DEFAULT NULL,
+  `points7` double DEFAULT NULL,
+  `status` int NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `checkin_point_user_id_1133ff6d_fk_auth_user_id` (`user_id`),
+  CONSTRAINT `checkin_point_user_id_1133ff6d_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for checkin_profile
+-- ----------------------------
+DROP TABLE IF EXISTS `checkin_profile`;
+CREATE TABLE `checkin_profile` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `address` longtext NOT NULL,
+  `post` longtext NOT NULL,
+  `tel` longtext NOT NULL,
+  `question1` int NOT NULL,
+  `question2` int NOT NULL,
+  `question3` int NOT NULL,
+  `address2` longtext NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `amphur_id` int NOT NULL,
+  `district_id` int NOT NULL,
+  `geo_id` int NOT NULL,
+  `province_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `checkin_profile_amphur_id_899c43f4_fk_checkin_amphur_id` (`amphur_id`),
+  KEY `checkin_profile_district_id_549bacbf_fk_checkin_district_id` (`district_id`),
+  KEY `checkin_profile_geo_id_95fe957a_fk_checkin_geography_id` (`geo_id`),
+  KEY `checkin_profile_province_id_642619bf_fk_checkin_province_id` (`province_id`),
+  CONSTRAINT `checkin_profile_amphur_id_899c43f4_fk_checkin_amphur_id` FOREIGN KEY (`amphur_id`) REFERENCES `checkin_amphur` (`id`),
+  CONSTRAINT `checkin_profile_district_id_549bacbf_fk_checkin_district_id` FOREIGN KEY (`district_id`) REFERENCES `checkin_district` (`id`),
+  CONSTRAINT `checkin_profile_geo_id_95fe957a_fk_checkin_geography_id` FOREIGN KEY (`geo_id`) REFERENCES `checkin_geography` (`id`),
+  CONSTRAINT `checkin_profile_province_id_642619bf_fk_checkin_province_id` FOREIGN KEY (`province_id`) REFERENCES `checkin_province` (`id`),
+  CONSTRAINT `checkin_profile_user_id_95d76f97_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of checkin_profile
+-- ----------------------------
+BEGIN;
+INSERT INTO `checkin_profile` VALUES (1, '161 หมู่ 1', '62130', '0988203979', 0, 0, 0, 'หอฮึๆ', '2020-07-21 00:50:39.030035', '2020-07-21 00:50:39.030116', 712, 6338, 2, 49, 3);
+COMMIT;
+
+-- ----------------------------
 -- Table structure for checkin_province
 -- ----------------------------
 DROP TABLE IF EXISTS `checkin_province`;
@@ -10030,5 +10451,327 @@ INSERT INTO `checkin_province` VALUES (75, '95', 'ยะลา   ', 6);
 INSERT INTO `checkin_province` VALUES (76, '96', 'นราธิวาส   ', 6);
 INSERT INTO `checkin_province` VALUES (77, '97', 'บึงกาฬ', 3);
 COMMIT;
+
+-- ----------------------------
+-- Table structure for dashboard_userdashboardmodule
+-- ----------------------------
+DROP TABLE IF EXISTS `dashboard_userdashboardmodule`;
+CREATE TABLE `dashboard_userdashboardmodule` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `module` varchar(255) NOT NULL,
+  `app_label` varchar(255) DEFAULT NULL,
+  `user` int unsigned NOT NULL,
+  `column` int unsigned NOT NULL,
+  `order` int NOT NULL,
+  `settings` longtext NOT NULL,
+  `children` longtext NOT NULL,
+  `collapsed` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `dashboard_userdashboardmodule_chk_1` CHECK ((`user` >= 0)),
+  CONSTRAINT `dashboard_userdashboardmodule_chk_2` CHECK ((`column` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of dashboard_userdashboardmodule
+-- ----------------------------
+BEGIN;
+INSERT INTO `dashboard_userdashboardmodule` VALUES (3, 'Quick links', 'jet.dashboard.modules.LinkList', NULL, 1, 0, 0, '{\"draggable\": false, \"deletable\": false, \"collapsible\": false, \"layout\": \"inline\"}', '[{\"title\": \"Return to site\", \"url\": \"/\"}, {\"title\": \"\\u0e40\\u0e1b\\u0e25\\u0e35\\u0e48\\u0e22\\u0e19\\u0e23\\u0e2b\\u0e31\\u0e2a\\u0e1c\\u0e48\\u0e32\\u0e19\", \"url\": \"/admin/password_change/\"}, {\"title\": \"\\u0e2d\\u0e2d\\u0e01\\u0e08\\u0e32\\u0e01\\u0e23\\u0e30\\u0e1a\\u0e1a\", \"url\": \"/admin/logout/\"}]', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (4, 'Applications', 'jet.dashboard.modules.AppList', NULL, 1, 1, 0, '{\"models\": null, \"exclude\": [\"auth.*\"]}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (5, 'การจัดการ', 'jet.dashboard.modules.AppList', NULL, 1, 2, 0, '{\"models\": [\"auth.*\"], \"exclude\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (6, 'Recent Actions', 'jet.dashboard.modules.RecentActions', NULL, 1, 0, 1, '{\"limit\": 10, \"include_list\": null, \"exclude_list\": null, \"user\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (7, 'Latest Django News', 'jet.dashboard.modules.Feed', NULL, 1, 1, 1, '{\"feed_url\": \"http://www.djangoproject.com/rss/weblog/\", \"limit\": 5}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (8, 'Support', 'jet.dashboard.modules.LinkList', NULL, 1, 2, 1, '{\"draggable\": true, \"deletable\": true, \"collapsible\": true, \"layout\": \"stacked\"}', '[{\"title\": \"Django documentation\", \"url\": \"http://docs.djangoproject.com/\", \"external\": true}, {\"title\": \"Django \\\"django-users\\\" mailing list\", \"url\": \"http://groups.google.com/group/django-users\", \"external\": true}, {\"title\": \"Django irc channel\", \"url\": \"irc://irc.freenode.net/django\", \"external\": true}]', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (9, 'Application models', 'jet.dashboard.modules.ModelList', 'account', 1, 0, 0, '{\"models\": [\"account.*\"], \"exclude\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (10, 'Recent Actions', 'jet.dashboard.modules.RecentActions', 'account', 1, 1, 0, '{\"limit\": 10, \"include_list\": [\"account.*\"], \"exclude_list\": null, \"user\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (11, 'Application models', 'jet.dashboard.modules.ModelList', 'authtoken', 1, 0, 0, '{\"models\": [\"authtoken.*\"], \"exclude\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (12, 'Recent Actions', 'jet.dashboard.modules.RecentActions', 'authtoken', 1, 1, 0, '{\"limit\": 10, \"include_list\": [\"authtoken.*\"], \"exclude_list\": null, \"user\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (13, 'Application models', 'jet.dashboard.modules.ModelList', 'auth', 1, 0, 0, '{\"models\": [\"auth.*\"], \"exclude\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (14, 'Recent Actions', 'jet.dashboard.modules.RecentActions', 'auth', 1, 1, 0, '{\"limit\": 10, \"include_list\": [\"auth.*\"], \"exclude_list\": null, \"user\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (15, 'Application models', 'jet.dashboard.modules.ModelList', 'checkin', 1, 0, 0, '{\"models\": [\"checkin.*\"], \"exclude\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (16, 'Recent Actions', 'jet.dashboard.modules.RecentActions', 'checkin', 1, 1, 0, '{\"limit\": 10, \"include_list\": [\"checkin.*\"], \"exclude_list\": null, \"user\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (17, 'Application models', 'jet.dashboard.modules.ModelList', 'sites', 1, 0, 0, '{\"models\": [\"sites.*\"], \"exclude\": null}', '', 0);
+INSERT INTO `dashboard_userdashboardmodule` VALUES (18, 'Recent Actions', 'jet.dashboard.modules.RecentActions', 'sites', 1, 1, 0, '{\"limit\": 10, \"include_list\": [\"sites.*\"], \"exclude_list\": null, \"user\": null}', '', 0);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for django_admin_log
+-- ----------------------------
+DROP TABLE IF EXISTS `django_admin_log`;
+CREATE TABLE `django_admin_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `action_time` datetime(6) NOT NULL,
+  `object_id` longtext,
+  `object_repr` varchar(200) NOT NULL,
+  `action_flag` smallint unsigned NOT NULL,
+  `change_message` longtext NOT NULL,
+  `content_type_id` int DEFAULT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `django_admin_log_content_type_id_c4bce8eb_fk_django_co` (`content_type_id`),
+  KEY `django_admin_log_user_id_c564eba6_fk_auth_user_id` (`user_id`),
+  CONSTRAINT `django_admin_log_content_type_id_c4bce8eb_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
+  CONSTRAINT `django_admin_log_user_id_c564eba6_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`),
+  CONSTRAINT `django_admin_log_chk_1` CHECK ((`action_flag` >= 0))
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of django_admin_log
+-- ----------------------------
+BEGIN;
+INSERT INTO `django_admin_log` VALUES (1, '2020-07-21 00:49:52.153967', '2', 'dcc7bbd3-d14b-4506-939a-d792e07f3869', 3, '', 4, 1);
+INSERT INTO `django_admin_log` VALUES (2, '2020-07-21 01:04:49.069050', '1', 'gps object (1)', 2, '[{\"changed\": {\"fields\": [\"District\"]}}]', 20, 1);
+INSERT INTO `django_admin_log` VALUES (3, '2020-07-21 01:06:05.469262', '1', 'gps object (1)', 2, '[{\"changed\": {\"fields\": [\"Geo\", \"Amphur\", \"Province\", \"District\"]}}]', 20, 1);
+INSERT INTO `django_admin_log` VALUES (4, '2020-07-21 01:45:33.516411', '1', 'Django', 2, '[{\"changed\": {\"fields\": [\"Logo\", \"Favicon\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (5, '2020-07-21 01:49:12.562665', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Name\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (6, '2020-07-21 01:49:29.093261', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Name\", \"Title\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (7, '2020-07-21 01:49:55.371835', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Background color\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (8, '2020-07-21 01:50:08.912740', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Text color\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (9, '2020-07-21 01:50:53.338047', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Text color\", \"Link hover color\", \"Background color\", \"Link hover color\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (10, '2020-07-21 02:00:40.403531', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Background color\", \"Background hover color\", \"Background color\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (11, '2020-07-21 02:01:24.832578', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Background color\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (12, '2020-07-21 02:03:45.246849', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Color\", \"Background color\", \"Link hover color\", \"Background color\", \"Background color\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (13, '2020-07-21 02:03:54.952486', '1', 'ระบบติดตาม นิสิต', 2, '[]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (14, '2020-07-21 02:04:08.938400', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Color\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (15, '2020-07-21 02:04:45.550219', '1', 'ระบบติดตาม นิสิต', 2, '[{\"changed\": {\"fields\": [\"Display\"]}}]', 24, 1);
+INSERT INTO `django_admin_log` VALUES (16, '2020-07-21 10:33:05.661206', '2', 'gps object (2)', 2, '[{\"changed\": {\"fields\": [\"Geo\"]}}]', 20, 1);
+COMMIT;
+
+-- ----------------------------
+-- Table structure for django_content_type
+-- ----------------------------
+DROP TABLE IF EXISTS `django_content_type`;
+CREATE TABLE `django_content_type` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `app_label` varchar(100) NOT NULL,
+  `model` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of django_content_type
+-- ----------------------------
+BEGIN;
+INSERT INTO `django_content_type` VALUES (11, 'account', 'emailaddress');
+INSERT INTO `django_content_type` VALUES (12, 'account', 'emailconfirmation');
+INSERT INTO `django_content_type` VALUES (1, 'admin', 'logentry');
+INSERT INTO `django_content_type` VALUES (24, 'admin_interface', 'theme');
+INSERT INTO `django_content_type` VALUES (3, 'auth', 'group');
+INSERT INTO `django_content_type` VALUES (2, 'auth', 'permission');
+INSERT INTO `django_content_type` VALUES (4, 'auth', 'user');
+INSERT INTO `django_content_type` VALUES (13, 'authtoken', 'token');
+INSERT INTO `django_content_type` VALUES (14, 'checkin', 'amphur');
+INSERT INTO `django_content_type` VALUES (15, 'checkin', 'district');
+INSERT INTO `django_content_type` VALUES (16, 'checkin', 'geography');
+INSERT INTO `django_content_type` VALUES (20, 'checkin', 'gps');
+INSERT INTO `django_content_type` VALUES (19, 'checkin', 'point');
+INSERT INTO `django_content_type` VALUES (18, 'checkin', 'profile');
+INSERT INTO `django_content_type` VALUES (17, 'checkin', 'province');
+INSERT INTO `django_content_type` VALUES (5, 'contenttypes', 'contenttype');
+INSERT INTO `django_content_type` VALUES (23, 'dashboard', 'userdashboardmodule');
+INSERT INTO `django_content_type` VALUES (21, 'jet', 'bookmark');
+INSERT INTO `django_content_type` VALUES (22, 'jet', 'pinnedapplication');
+INSERT INTO `django_content_type` VALUES (6, 'sessions', 'session');
+INSERT INTO `django_content_type` VALUES (7, 'sites', 'site');
+INSERT INTO `django_content_type` VALUES (8, 'socialaccount', 'socialaccount');
+INSERT INTO `django_content_type` VALUES (9, 'socialaccount', 'socialapp');
+INSERT INTO `django_content_type` VALUES (10, 'socialaccount', 'socialtoken');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for django_migrations
+-- ----------------------------
+DROP TABLE IF EXISTS `django_migrations`;
+CREATE TABLE `django_migrations` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `app` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `applied` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of django_migrations
+-- ----------------------------
+BEGIN;
+INSERT INTO `django_migrations` VALUES (1, 'contenttypes', '0001_initial', '2020-07-21 00:47:31.702674');
+INSERT INTO `django_migrations` VALUES (2, 'auth', '0001_initial', '2020-07-21 00:47:31.896816');
+INSERT INTO `django_migrations` VALUES (3, 'account', '0001_initial', '2020-07-21 00:47:32.070154');
+INSERT INTO `django_migrations` VALUES (4, 'account', '0002_email_max_length', '2020-07-21 00:47:32.111670');
+INSERT INTO `django_migrations` VALUES (5, 'admin', '0001_initial', '2020-07-21 00:47:32.130913');
+INSERT INTO `django_migrations` VALUES (6, 'admin', '0002_logentry_remove_auto_add', '2020-07-21 00:47:32.154267');
+INSERT INTO `django_migrations` VALUES (7, 'admin', '0003_logentry_add_action_flag_choices', '2020-07-21 00:47:32.161803');
+INSERT INTO `django_migrations` VALUES (8, 'contenttypes', '0002_remove_content_type_name', '2020-07-21 00:47:32.211515');
+INSERT INTO `django_migrations` VALUES (9, 'auth', '0002_alter_permission_name_max_length', '2020-07-21 00:47:32.238569');
+INSERT INTO `django_migrations` VALUES (10, 'auth', '0003_alter_user_email_max_length', '2020-07-21 00:47:32.299506');
+INSERT INTO `django_migrations` VALUES (11, 'auth', '0004_alter_user_username_opts', '2020-07-21 00:47:32.307398');
+INSERT INTO `django_migrations` VALUES (12, 'auth', '0005_alter_user_last_login_null', '2020-07-21 00:47:32.336290');
+INSERT INTO `django_migrations` VALUES (13, 'auth', '0006_require_contenttypes_0002', '2020-07-21 00:47:32.339971');
+INSERT INTO `django_migrations` VALUES (14, 'auth', '0007_alter_validators_add_error_messages', '2020-07-21 00:47:32.348588');
+INSERT INTO `django_migrations` VALUES (15, 'auth', '0008_alter_user_username_max_length', '2020-07-21 00:47:32.438081');
+INSERT INTO `django_migrations` VALUES (16, 'auth', '0009_alter_user_last_name_max_length', '2020-07-21 00:47:32.479738');
+INSERT INTO `django_migrations` VALUES (17, 'auth', '0010_alter_group_name_max_length', '2020-07-21 00:47:32.499735');
+INSERT INTO `django_migrations` VALUES (18, 'auth', '0011_update_proxy_permissions', '2020-07-21 00:47:32.508429');
+INSERT INTO `django_migrations` VALUES (19, 'authtoken', '0001_initial', '2020-07-21 00:47:32.527375');
+INSERT INTO `django_migrations` VALUES (20, 'authtoken', '0002_auto_20160226_1747', '2020-07-21 00:47:32.702066');
+INSERT INTO `django_migrations` VALUES (21, 'checkin', '0001_initial', '2020-07-21 00:47:32.919962');
+INSERT INTO `django_migrations` VALUES (22, 'sessions', '0001_initial', '2020-07-21 00:47:33.122365');
+INSERT INTO `django_migrations` VALUES (23, 'sites', '0001_initial', '2020-07-21 00:47:33.139351');
+INSERT INTO `django_migrations` VALUES (24, 'sites', '0002_alter_domain_unique', '2020-07-21 00:47:33.152152');
+INSERT INTO `django_migrations` VALUES (25, 'socialaccount', '0001_initial', '2020-07-21 00:47:33.239281');
+INSERT INTO `django_migrations` VALUES (26, 'socialaccount', '0002_token_max_lengths', '2020-07-21 00:47:33.316598');
+INSERT INTO `django_migrations` VALUES (27, 'socialaccount', '0003_extra_data_default_dict', '2020-07-21 00:47:33.323968');
+INSERT INTO `django_migrations` VALUES (28, 'jet', '0001_initial', '2020-07-21 01:15:11.892369');
+INSERT INTO `django_migrations` VALUES (29, 'jet', '0002_delete_userdashboardmodule', '2020-07-21 01:15:11.908023');
+INSERT INTO `django_migrations` VALUES (30, 'dashboard', '0001_initial', '2020-07-21 01:20:29.405706');
+INSERT INTO `django_migrations` VALUES (31, 'admin_interface', '0001_initial', '2020-07-21 01:44:27.905709');
+INSERT INTO `django_migrations` VALUES (32, 'admin_interface', '0002_add_related_modal', '2020-07-21 01:44:28.170045');
+INSERT INTO `django_migrations` VALUES (33, 'admin_interface', '0003_add_logo_color', '2020-07-21 01:44:28.207398');
+INSERT INTO `django_migrations` VALUES (34, 'admin_interface', '0004_rename_title_color', '2020-07-21 01:44:28.222398');
+INSERT INTO `django_migrations` VALUES (35, 'admin_interface', '0005_add_recent_actions_visible', '2020-07-21 01:44:28.252117');
+INSERT INTO `django_migrations` VALUES (36, 'admin_interface', '0006_bytes_to_str', '2020-07-21 01:44:28.317371');
+INSERT INTO `django_migrations` VALUES (37, 'admin_interface', '0007_add_favicon', '2020-07-21 01:44:28.344337');
+INSERT INTO `django_migrations` VALUES (38, 'admin_interface', '0008_change_related_modal_background_opacity_type', '2020-07-21 01:44:28.437018');
+INSERT INTO `django_migrations` VALUES (39, 'admin_interface', '0009_add_enviroment', '2020-07-21 01:44:28.537190');
+INSERT INTO `django_migrations` VALUES (40, 'admin_interface', '0010_add_localization', '2020-07-21 01:44:28.554622');
+INSERT INTO `django_migrations` VALUES (41, 'admin_interface', '0011_add_environment_options', '2020-07-21 01:44:28.647652');
+INSERT INTO `django_migrations` VALUES (42, 'admin_interface', '0012_update_verbose_names', '2020-07-21 01:44:28.656655');
+INSERT INTO `django_migrations` VALUES (43, 'admin_interface', '0013_add_related_modal_close_button', '2020-07-21 01:44:28.680546');
+INSERT INTO `django_migrations` VALUES (44, 'admin_interface', '0014_name_unique', '2020-07-21 01:44:28.727872');
+INSERT INTO `django_migrations` VALUES (45, 'admin_interface', '0015_add_language_chooser_active', '2020-07-21 01:44:28.752253');
+INSERT INTO `django_migrations` VALUES (46, 'admin_interface', '0016_add_language_chooser_display', '2020-07-21 01:44:28.776729');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for django_session
+-- ----------------------------
+DROP TABLE IF EXISTS `django_session`;
+CREATE TABLE `django_session` (
+  `session_key` varchar(40) NOT NULL,
+  `session_data` longtext NOT NULL,
+  `expire_date` datetime(6) NOT NULL,
+  PRIMARY KEY (`session_key`),
+  KEY `django_session_expire_date_a5c62663` (`expire_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of django_session
+-- ----------------------------
+BEGIN;
+INSERT INTO `django_session` VALUES ('n3fu5r6u82uy14zykj1g38or8ruo64ox', 'NzU4MjJlY2NkZDM0OTc5YjA3NmI0OTY5YjQ0Y2FlZjViMjQ1ZmExMTp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIzMDk1ZDhiOWI5N2I2NTFhZmNhYzA0ZTdhOTdkZDYyZmI4MDBkNmY5In0=', '2020-08-04 01:59:34.044776');
+INSERT INTO `django_session` VALUES ('wzwnvo62o72zxrnj3tbfnzkf359v4s3d', 'NzU4MjJlY2NkZDM0OTc5YjA3NmI0OTY5YjQ0Y2FlZjViMjQ1ZmExMTp7Il9hdXRoX3VzZXJfaWQiOiIxIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiIzMDk1ZDhiOWI5N2I2NTFhZmNhYzA0ZTdhOTdkZDYyZmI4MDBkNmY5In0=', '2020-08-04 01:59:34.005277');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for django_site
+-- ----------------------------
+DROP TABLE IF EXISTS `django_site`;
+CREATE TABLE `django_site` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `domain` varchar(100) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `django_site_domain_a2e37b91_uniq` (`domain`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Records of django_site
+-- ----------------------------
+BEGIN;
+INSERT INTO `django_site` VALUES (1, 'example.com', 'example.com');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for jet_bookmark
+-- ----------------------------
+DROP TABLE IF EXISTS `jet_bookmark`;
+CREATE TABLE `jet_bookmark` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `url` varchar(200) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `user` int unsigned NOT NULL,
+  `date_add` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `jet_bookmark_chk_1` CHECK ((`user` >= 0))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for jet_pinnedapplication
+-- ----------------------------
+DROP TABLE IF EXISTS `jet_pinnedapplication`;
+CREATE TABLE `jet_pinnedapplication` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `app_label` varchar(255) NOT NULL,
+  `user` int unsigned NOT NULL,
+  `date_add` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `jet_pinnedapplication_chk_1` CHECK ((`user` >= 0))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for socialaccount_socialaccount
+-- ----------------------------
+DROP TABLE IF EXISTS `socialaccount_socialaccount`;
+CREATE TABLE `socialaccount_socialaccount` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `provider` varchar(30) NOT NULL,
+  `uid` varchar(191) NOT NULL,
+  `last_login` datetime(6) NOT NULL,
+  `date_joined` datetime(6) NOT NULL,
+  `extra_data` longtext NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `socialaccount_socialaccount_provider_uid_fc810c6e_uniq` (`provider`,`uid`),
+  KEY `socialaccount_socialaccount_user_id_8146e70c_fk_auth_user_id` (`user_id`),
+  CONSTRAINT `socialaccount_socialaccount_user_id_8146e70c_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for socialaccount_socialapp
+-- ----------------------------
+DROP TABLE IF EXISTS `socialaccount_socialapp`;
+CREATE TABLE `socialaccount_socialapp` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `provider` varchar(30) NOT NULL,
+  `name` varchar(40) NOT NULL,
+  `client_id` varchar(191) NOT NULL,
+  `secret` varchar(191) NOT NULL,
+  `key` varchar(191) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for socialaccount_socialapp_sites
+-- ----------------------------
+DROP TABLE IF EXISTS `socialaccount_socialapp_sites`;
+CREATE TABLE `socialaccount_socialapp_sites` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `socialapp_id` int NOT NULL,
+  `site_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `socialaccount_socialapp_sites_socialapp_id_site_id_71a9a768_uniq` (`socialapp_id`,`site_id`),
+  KEY `socialaccount_socialapp_sites_site_id_2579dee5_fk_django_site_id` (`site_id`),
+  CONSTRAINT `socialaccount_social_socialapp_id_97fb6e7d_fk_socialacc` FOREIGN KEY (`socialapp_id`) REFERENCES `socialaccount_socialapp` (`id`),
+  CONSTRAINT `socialaccount_socialapp_sites_site_id_2579dee5_fk_django_site_id` FOREIGN KEY (`site_id`) REFERENCES `django_site` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+
+-- ----------------------------
+-- Table structure for socialaccount_socialtoken
+-- ----------------------------
+DROP TABLE IF EXISTS `socialaccount_socialtoken`;
+CREATE TABLE `socialaccount_socialtoken` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `token` longtext NOT NULL,
+  `token_secret` longtext NOT NULL,
+  `expires_at` datetime(6) DEFAULT NULL,
+  `account_id` int NOT NULL,
+  `app_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `socialaccount_socialtoken_app_id_account_id_fca4e0ac_uniq` (`app_id`,`account_id`),
+  KEY `socialaccount_social_account_id_951f210e_fk_socialacc` (`account_id`),
+  CONSTRAINT `socialaccount_social_account_id_951f210e_fk_socialacc` FOREIGN KEY (`account_id`) REFERENCES `socialaccount_socialaccount` (`id`),
+  CONSTRAINT `socialaccount_social_app_id_636a42d7_fk_socialacc` FOREIGN KEY (`app_id`) REFERENCES `socialaccount_socialapp` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

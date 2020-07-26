@@ -25,7 +25,7 @@ SECRET_KEY = '0*3m6rtjn-dz(b$i2qkq%*h3nqa%%=s=)xo0j$7wy^no!&j63%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["www.lemperor.xyz","localhost"]
 SITE_ID = 1
 
 # Application definition
@@ -95,7 +95,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'checkin',
         'USER': 'root',
-        'PASSWORD': 'password1234',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
