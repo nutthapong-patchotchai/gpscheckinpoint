@@ -7,7 +7,7 @@ from checkin.views.views import (GPSCreateAPIView, GPSDetailAPIView,
                                  ProvinceCreateAPIView, ProvinceDetailAPIView, 
                                  AmphurCreateAPIView, AmphurDetailAPIView,
                                  DistrictCreateAPIView, DistrictDetailAPIView, ProfileFullDetailAPIView,
-                                 DistrictAllDetailAPIView,ProvinceFullDetailAPIView, PointUserDetailAPIView
+                                 DistrictAllDetailAPIView,ProvinceFullDetailAPIView, PointUserDetailAPIView, GPSHistoryAPIView, GPSExistAPIView
                                  )
 
 
@@ -32,5 +32,6 @@ urlpatterns = [
     path("profilefull/<int:pk>/", ProfileFullDetailAPIView.as_view(), name='profilefull-detail'),
     path("districtfull/<int:pk>/", DistrictAllDetailAPIView.as_view(), name='districtfull-detail'),
     path("provincesearch/", ProvinceFullDetailAPIView.as_view(), name='provinprovincesearchce'),
-     
+    path("gps/history/<int:pk>/", GPSHistoryAPIView.as_view(), name='GPSHistoryAPIView'),
+    path("gps/exist/<int:pk>/", GPSExistAPIView.as_view(), name='GPSExistAPIView'),
 ]

@@ -6,6 +6,9 @@ from checkin.serializer.serializers import GpsSerializer, PointSerializer, UserS
 from checkin.serializer.RegisterSerializer import UserRegistrationView
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils.timezone import datetime #important if using timezones
+
+
 
 class UserCreateAPIView(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -42,6 +45,19 @@ class GPSCreateAPIView(generics.ListCreateAPIView):
 class GPSDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = gps.objects.all()
     serializer_class = GpsSerializer
+
+class GPSHistoryAPIView(APIView): 
+     def get(self, request,pk, format=None): 
+        queryset = gps.objects.filter(user__id=pk).order_by('-updated_at')
+        serializer = GpsSerializer(queryset,many=True) 
+        return Response(serializer.data) 
+
+class GPSExistAPIView(APIView): 
+     def get(self, request,pk, format=None): 
+        today = datetime.now().date()
+        queryset = gps.objects.filter(user__id=pk,created_at__gte=today).exists()
+        serializer = GpsSerializer(queryset,many=True) 
+        return Response({"result":queryset}) 
 
 
 class PointCreateAPIView(generics.ListCreateAPIView):
@@ -109,3 +125,4 @@ class ProvinceFullDetailAPIView(APIView):
         queryset = District.objects.filter(province__id=provinceset.id,name=distName).first()
         serializer = DistrictSerializer(queryset) 
         return Response(serializer.data)
+        

@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
  
 
 def get_first_name(self):
-    return "%s %s"%(self.first_name, self.last_name)
+    return "%s %s %s"%(self.id, self.first_name, self.last_name)
 User.add_to_class("__str__", get_first_name)
 
 class profile(models.Model):
@@ -29,7 +29,7 @@ class profile(models.Model):
 
     @property
     def full_name(self):
-        return "%s %s"%(self.user.first_name, self.user.last_name) 
+        return "%s %s %s"%(self.user.id, self.user.first_name, self.user.last_name) 
     def geo_name(self):
         return "%s"%(self.geo.name)
     def province_name(self):
