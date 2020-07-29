@@ -18,7 +18,7 @@ class CheckinAdmin(admin.ModelAdmin):
 admin.site.register(gps,CheckinAdmin)
 
 class pointAdmin(admin.ModelAdmin): 
-    search_fields = ['address']
+    search_fields = ['user__first_name','user__last_name']
     list_display = ('full_name','created_at','updated_at')
 admin.site.register(point,pointAdmin) 
  
