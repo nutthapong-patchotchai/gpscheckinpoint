@@ -1,3 +1,7 @@
+import csv,io
+
+from django.db.models import Count, Max
+from django.http import HttpResponse
 from rest_framework import generics
 from django.contrib.auth.models import User
 from checkin.models import gps, point, profile
@@ -125,4 +129,32 @@ class ProvinceFullDetailAPIView(APIView):
         queryset = District.objects.filter(province__id=provinceset.id,name=distName).first()
         serializer = DistrictSerializer(queryset) 
         return Response(serializer.data)
-        
+
+
+def createcsv(request):
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="Checkinlog.csv"; encoding="utf-8-sig"'
+    response.write(u'\ufeff'.encode('utf8'))
+
+    writer = csv.writer(response)
+    writer.writerow(["รหัสนิสิต", "ภาค", "จังหวัด", "มีไข้", "ไอ", "มีน้ำมูก", "เจ็บคอ"
+                     , "หายใจเร็วหรือหายใจลำบาก", "จมูกเริ่มไม่ได้กลิ่น", "ปรกติ",
+                     "วันที่เช็คอิน", "เบอร์โทร", "ชื่อหอ"])
+
+    for obj in gps.objects.all().order_by('-user__email', 'created_at').reverse():
+        if gps.objects.filter(user__email=obj.user.email).count() > 1:
+            if gps.objects.filter(user__email=obj.user.email).exists():
+                writer.writerow([obj.user.email, obj.geo, obj.province, obj.sick1,
+                             obj.sick2, obj.sick3, obj.sick4, obj.sick5, obj.sick6,
+                             obj.sick7, obj.created_at, obj.user.profile.tel,
+                             obj.user.profile.address2])
+        else:
+            writer.writerow([obj.user.email, obj.geo, obj.province, obj.sick1,
+                             obj.sick2, obj.sick3, obj.sick4, obj.sick5, obj.sick6,
+                             obj.sick7, obj.created_at, obj.user.profile.tel,
+                             obj.user.profile.address2])
+
+
+
+    return response
