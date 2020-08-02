@@ -11,8 +11,8 @@ from checkin.serializer.RegisterSerializer import UserRegistrationView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.timezone import datetime #important if using timezones
-import datetime, time
 
+from datetime import datetime, time
 
 
 class UserCreateAPIView(generics.ListCreateAPIView):
