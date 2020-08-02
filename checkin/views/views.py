@@ -11,6 +11,7 @@ from checkin.serializer.RegisterSerializer import UserRegistrationView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.timezone import datetime #important if using timezones
+import datetime, time
 
 
 
@@ -129,32 +130,52 @@ class ProvinceFullDetailAPIView(APIView):
         queryset = District.objects.filter(province__id=provinceset.id,name=distName).first()
         serializer = DistrictSerializer(queryset) 
         return Response(serializer.data)
+def splitStr(str):
+    output = str.split('@')
+    return output[0]
+def dateConvert(strr):
+    ds = str(strr).split(" ")
+    ds = ds[0]
+    dd = datetime.datetime.strptime(ds, "%Y-%m-%d").strftime('%d/%m/%Y')
+    return dd
+def phoneFormat(num):
+    dd = str(num)
+    if ((len(dd)) == 10):
+        dd = format(int(dd[:-1]), ",").replace(",", "-") + dd[-1]
+        dd = "0"+dd
+    return dd
+class createcsv(APIView):
+    def get(self, request,format=None):
 
+      response = HttpResponse(content_type='text/csv')
+      response['Content-Disposition'] = 'attachment; filename="Checkinlog.csv"; encoding="utf-8-sig"'
+      response.write(u'\ufeff'.encode('utf8'))
 
-def createcsv(request):
+      writer = csv.writer(response)
+      writer.writerow(["รหัสนิสิต", "ภาค", "จังหวัด", "มีไข้", "ไอ", "มีน้ำมูก", "เจ็บคอ"
+                       , "หายใจเร็วหรือหายใจลำบาก", "จมูกเริ่มไม่ได้กลิ่น", "ปกติ",
+                       "วันที่เช็คอิน", "เบอร์โทร", "ชื่อหอ"])
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="Checkinlog.csv"; encoding="utf-8-sig"'
-    response.write(u'\ufeff'.encode('utf8'))
+      tmp = gps.objects.all().order_by('user__email','created_at').values('id', 'user_id')
+      unique = {each['user_id']: each['id'] for each in tmp}.values()
+      queryset = gps.objects.filter(id__in=unique)\
+        .values('user_id','user__email','geo__name','province__name','sick1','sick2','sick3','sick4','sick5','sick6','sick7','created_at','user__profile__tel','user__profile__address2')
+      output = []
+      for data in queryset:
+        writer.writerow([
+            splitStr(data['user__email']),
+            data['geo__name'],
+            data['province__name'],
+            data['sick1'],
+            data['sick2'],
+            data['sick3'],
+            data['sick4'],
+            data['sick5'],
+            data['sick6'],
+            data['sick7'],
+            dateConvert(data['created_at']),
+            phoneFormat(str(data['user__profile__tel'])),
+            data['user__profile__address2'],
+        ])
+      return response
 
-    writer = csv.writer(response)
-    writer.writerow(["รหัสนิสิต", "ภาค", "จังหวัด", "มีไข้", "ไอ", "มีน้ำมูก", "เจ็บคอ"
-                     , "หายใจเร็วหรือหายใจลำบาก", "จมูกเริ่มไม่ได้กลิ่น", "ปรกติ",
-                     "วันที่เช็คอิน", "เบอร์โทร", "ชื่อหอ"])
-
-    for obj in gps.objects.all().order_by('-user__email', 'created_at').reverse():
-        if gps.objects.filter(user__email=obj.user.email).count() > 1:
-            if gps.objects.filter(user__email=obj.user.email).exists():
-                writer.writerow([obj.user.email, obj.geo, obj.province, obj.sick1,
-                             obj.sick2, obj.sick3, obj.sick4, obj.sick5, obj.sick6,
-                             obj.sick7, obj.created_at, obj.user.profile.tel,
-                             obj.user.profile.address2])
-        else:
-            writer.writerow([obj.user.email, obj.geo, obj.province, obj.sick1,
-                             obj.sick2, obj.sick3, obj.sick4, obj.sick5, obj.sick6,
-                             obj.sick7, obj.created_at, obj.user.profile.tel,
-                             obj.user.profile.address2])
-
-
-
-    return response

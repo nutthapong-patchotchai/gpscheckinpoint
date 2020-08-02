@@ -47,7 +47,10 @@ class gps(models.Model):
         try:
           return "%s"%(self.district.name)
         except:
-          return "-" 
+          return "-"
+
+    def __str__(self):
+        return self.user.email
 
 class point(models.Model):
     class Meta:

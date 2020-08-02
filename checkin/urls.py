@@ -35,5 +35,5 @@ urlpatterns = [
     path("provincesearch/", ProvinceFullDetailAPIView.as_view(), name='provinprovincesearchce'),
     path("gps/history/<int:pk>/", GPSHistoryAPIView.as_view(), name='GPSHistoryAPIView'),
     path("gps/exist/<int:pk>/", GPSExistAPIView.as_view(), name='GPSExistAPIView'),
-    path("doc/create", createcsv, name='Document'),
+    path("doc/create", createcsv.as_view(), name='Document'),
 ]
