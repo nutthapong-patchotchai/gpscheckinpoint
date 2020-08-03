@@ -11,8 +11,8 @@ from checkin.serializer.RegisterSerializer import UserRegistrationView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.timezone import datetime #important if using timezones
-
 from datetime import datetime, time
+
 
 
 class UserCreateAPIView(generics.ListCreateAPIView):
@@ -154,12 +154,12 @@ class createcsv(APIView):
       writer = csv.writer(response)
       writer.writerow(["รหัสนิสิต", "ภาค", "จังหวัด", "มีไข้", "ไอ", "มีน้ำมูก", "เจ็บคอ"
                        , "หายใจเร็วหรือหายใจลำบาก", "จมูกเริ่มไม่ได้กลิ่น", "ปกติ",
-                       "วันที่เช็คอิน", "เบอร์โทร", "ชื่อหอ"])
+                       "วันที่เช็คอิน", "เบอร์โทร", "ชื่อหอ","latitude","longitude"])
 
       tmp = gps.objects.all().order_by('user__email','created_at').values('id', 'user_id')
       unique = {each['user_id']: each['id'] for each in tmp}.values()
       queryset = gps.objects.filter(id__in=unique)\
-        .values('user_id','user__email','geo__name','province__name','sick1','sick2','sick3','sick4','sick5','sick6','sick7','created_at','user__profile__tel','user__profile__address2')
+        .values('user_id','user__email','geo__name','province__name','sick1','sick2','sick3','sick4','sick5','sick6','sick7','created_at','user__profile__tel','user__profile__address2','latitude','longitude')
       output = []
       for data in queryset:
         writer.writerow([
@@ -176,6 +176,8 @@ class createcsv(APIView):
             dateConvert(data['created_at']),
             phoneFormat(str(data['user__profile__tel'])),
             data['user__profile__address2'],
+            data['latitude'],
+            data['longitude']
         ])
       return response
 
