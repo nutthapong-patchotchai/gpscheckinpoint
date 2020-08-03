@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.timezone import datetime #important if using timezones
 from datetime import datetime, time
-
+import datetime as docdate 
 
 
 class UserCreateAPIView(generics.ListCreateAPIView):
@@ -136,7 +136,7 @@ def splitStr(str):
 def dateConvert(strr):
     ds = str(strr).split(" ")
     ds = ds[0]
-    dd = datetime.datetime.strptime(ds, "%Y-%m-%d").strftime('%d/%m/%Y')
+    dd = docdate.datetime.strptime(ds, "%Y-%m-%d").strftime('%d/%m/%Y')
     return dd
 def phoneFormat(num):
     dd = str(num)
