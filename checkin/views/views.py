@@ -13,52 +13,60 @@ from rest_framework.views import APIView
 from django.utils.timezone import datetime #important if using timezones
 from datetime import datetime, time
 import datetime as docdate 
-
+from rest_framework.permissions import IsAuthenticated
 
 class UserCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class UserDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class ProfileCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = profile.objects.all()
     serializer_class = ProfileSerializer
 
 
 class ProfileDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request,pk, format=None):
         queryset = profile.objects.get(user__id=pk)
         serializer = ProfileSerializer(queryset) 
         return Response(serializer.data)
 
 class ProfileFullDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request,pk, format=None):
         queryset = profile.objects.get(user__id=pk)
         serializer = ProfileFullSerializer(queryset) 
         return Response(serializer.data)
 
 class GPSCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = gps.objects.all()
     serializer_class = GpsSerializer
 
 
 class GPSDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = gps.objects.all()
     serializer_class = GpsSerializer
 
 class GPSHistoryAPIView(APIView): 
-     def get(self, request,pk, format=None): 
+    permission_classes = [IsAuthenticated]
+    def get(self, request,pk, format=None): 
         queryset = gps.objects.filter(user__id=pk).order_by('-updated_at')
         serializer = GpsSerializer(queryset,many=True) 
         return Response(serializer.data) 
 
 class GPSExistAPIView(APIView): 
-     def get(self, request,pk, format=None): 
+    def get(self, request,pk, format=None): 
         today = datetime.now().date()
         queryset = gps.objects.filter(user__id=pk,created_at__gte=today).exists()
         serializer = GpsSerializer(queryset,many=True) 
