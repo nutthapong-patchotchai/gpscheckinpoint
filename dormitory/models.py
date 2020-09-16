@@ -108,7 +108,7 @@ class DormOwner(models.Model):
     )
     dorm = models.ForeignKey(Dorm, on_delete=models.CASCADE)
     name = models.CharField(blank=True, null=True,max_length=100,verbose_name="ชื่อ-สกุล")
-    type_owner = models.CharField(blank=True, null=True,max_length=100,choices=OWNERS,verbose_name="ชื่อ-สกุล")
+    type_owner = models.CharField(blank=True, null=True,max_length=100,choices=OWNERS,verbose_name="ตำแหน่ง")
 
 class About(models.Model):
     class Meta:
