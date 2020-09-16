@@ -23,7 +23,12 @@ admin.site.register(DormStyle)
 #     filter_horizontal = ('choice',)
 
 # admin.site.register(DormStyle,DormdminModel)
-
+class DormOwnerInline(admin.TabularInline):
+    model = DormOwner
+    # filter_horizontal = ('choice',)
+    def get_extra(self, request, obj=None, **kwargs):
+        extra = 1
+        return extra
 class WoodInline(admin.TabularInline):
     model = DormStyle
     # filter_horizontal = ('choice',)
@@ -43,7 +48,7 @@ class DormImageInline(admin.TabularInline):
         extra = 1
         return extra
 class PropertiesAdmin(admin.ModelAdmin): 
-    inlines = [DormDetailInline,WoodInline,DormImageInline, ] 
+    inlines = [DormOwnerInline,DormDetailInline,WoodInline,DormImageInline, ] 
     autocomplete_fields = ['province','amphur','district']
 
 admin.site.register(Dorm, PropertiesAdmin)
