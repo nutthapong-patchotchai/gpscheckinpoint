@@ -46,6 +46,16 @@ class ProfileFullDetailAPIView(APIView):
         queryset = profile.objects.get(user__id=pk)
         serializer = ProfileFullSerializer(queryset) 
         return Response(serializer.data)
+    def put(self, request, pk=None):
+        try:
+            item = profile.objects.get(pk=pk)
+        except profile.DoesNotExist:
+            return Response(status=404)
+        serializer = ProfileFullSerializer(item, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
 
 class GPSCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]

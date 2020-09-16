@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from rest_framework import generics
+from rest_framework.views import APIView
 from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About)
 from dormitory.serializer.serializers import (ChoiceSerializer, DormSerializer,
                                               DormStyleSerializer, DormImageSerializer,
                                               DormOwnerSerializer, AboutSerializer,
                                               DormDetailSerializer)
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.viewsets import ViewSet
+from rest_framework.response import Response
 
 class ChoiceCreateAPIView(generics.ListCreateAPIView):
     queryset = Choice.objects.all()
@@ -77,3 +80,41 @@ class AboutCreateAPIView(generics.ListCreateAPIView):
 class AboutDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = About.objects.all()
     serializer_class = AboutSerializer
+
+class Test(APIView):
+    def get(self, request, format=None):
+        detail = DormDetail.objects.all()
+        data = []
+        for n in detail:
+            price = 0
+            if(n.fan_price_month > 0 and n.air_price_month > 0):
+                price = n.fan_price_month
+            else:
+                price = n.air_price_month
+            data.append({
+                'dorm_id':n.dorm_id,
+                'price' : price 
+            })
+
+        #     test = Dorm.objects.filter(name=n['name']).values_list('id', flat=True).first()
+        #     choice = Choice.objects.filter(name="โซนหอพัก").filter(value=n['zone']).values_list('id', flat=True).first() 
+        #     das.append(
+        #         {
+        #             "dorm_id":test,
+        #             'zone':choice
+        #         }
+        #     )
+        # choice = Choice.objects.filter(name="โซนหอพัก").filter(value="B").values_list('id', flat=True).first() 
+        
+        # queryset = DormStyle.objects.filter(choice=choice).values_list('dorm_id', flat=True) 
+        return Response(data)
+
+class TestAPIView(generics.ListCreateAPIView):
+    queryset = Dorm.objects.all()
+    serializer_class = DormSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('name','geo',)
+
+class DormListHome(generics.ListCreateAPIView):
+    queryset = Dorm.objects.all().order_by('id')[:10:1]
+    serializer_class = DormSerializer

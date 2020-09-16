@@ -50,6 +50,11 @@ class Dorm(models.Model):
 
     def __str__(self):
         return '{} : {}'.format(self.name,self.address)
+    @property
+    def zone(self):
+        verbose_name =" รหัสไปรศณีย์"
+        test = DormStyle.objects.filter(choice__name="โซนหอพัก").filter(dorm__id=self.id).values_list('choice__value', flat=True).first() 
+        return test 
 
 class DormDetail(models.Model):
     class Meta:
@@ -75,7 +80,7 @@ class DormDetail(models.Model):
     water_internet = models.IntegerField(default=0,verbose_name="อัตราค่าบริการอินเตอร์เน็ตรายเดือน ")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
 class DormStyle(models.Model):
     class Meta:
         verbose_name = _("รายละเอียดหอพัก")
