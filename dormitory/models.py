@@ -3,10 +3,10 @@ from checkin.models.address import *
 from django.utils.translation import ugettext_lazy as _
 from ckeditor.fields import RichTextField
 
-class Choice(models.Model):
+class Choice(models.Model): 
     class Meta:
         verbose_name = _("จัดการประเภทตัวเลือก")
-        verbose_name_plural = _("จัดการประเภทตัวเลือก")
+        verbose_name_plural = _("จัดการประเภทตัวเลือก") 
     ANSWERS = (
         ('การจดทะเบียนขออนุญาตผู้ประกอบกิจการหอพัก','การจดทะเบียนขออนุญาตผู้ประกอบกิจการหอพัก'),
         ('ประเภทของหอพัก', 'ประเภทของหอพัก'),
@@ -45,6 +45,9 @@ class Dorm(models.Model):
    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{} : {}'.format(self.name,self.address)
 
 class DormDetail(models.Model):
     class Meta:
