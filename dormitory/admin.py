@@ -47,3 +47,5 @@ class PropertiesAdmin(admin.ModelAdmin):
     autocomplete_fields = ['province','amphur','district']
 
 admin.site.register(Dorm, PropertiesAdmin)
+
+admin.site.register(About)

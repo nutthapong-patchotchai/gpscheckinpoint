@@ -25,7 +25,7 @@ SECRET_KEY = '0*3m6rtjn-dz(b$i2qkq%*h3nqa%%=s=)xo0j$7wy^no!&j63%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["www.lemperor.xyz","localhost"]
+ALLOWED_HOSTS = ["www.lemperor.xyz","localhost",'127.0.0.1']
 SITE_ID = 1
 
 # Application definition
@@ -47,10 +47,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'rest_framework.authtoken',
     'rest_auth.registration',
-    
+    'ckeditor',
     # 'proflie',
     'checkin',
-    'dormitory'
+    'dormitory', 
 ]
 
 MIDDLEWARE = [
@@ -91,17 +91,17 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 DATABASES = {
     'default': {
-         'ENGINE': 'django.db.backends.sqlite3',
-         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'checkin',
-        # 'USER': 'root',
-        # 'PASSWORD': '',
-        # 'HOST': 'localhost',
-        # 'PORT': '3306',
-        # 'OPTIONS': {
-        #     "init_command": "SET foreign_key_checks = 0;",
-        # },
+        #  'ENGINE': 'django.db.backends.sqlite3',
+        #  'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'checkin',
+        'USER': 'root',
+        'PASSWORD': 'P@$$w0rd1234',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        },
     }
 }
 REST_FRAMEWORK = {

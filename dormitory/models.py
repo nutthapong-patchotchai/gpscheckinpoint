@@ -1,6 +1,7 @@
 from django.db import models
 from checkin.models.address import *
 from django.utils.translation import ugettext_lazy as _
+from ckeditor.fields import RichTextField
 
 class Choice(models.Model):
     class Meta:
@@ -105,3 +106,15 @@ class DormOwner(models.Model):
     name = models.CharField(blank=True, null=True,max_length=100,verbose_name="ชื่อ-สกุล")
     type_owner = models.CharField(blank=True, null=True,max_length=100,choices=OWNERS,verbose_name="ชื่อ-สกุล")
 
+class About(models.Model):
+    class Meta:
+        verbose_name = _("ตั้งค่าหน้า เกี่ยวกับ")
+        verbose_name_plural = _("ตั้งค่าหน้า เกี่ยวกับ")
+    title = models.CharField(max_length=255,verbose_name="หัวข้อ")
+    text = models.CharField(max_length=255,verbose_name="เนื้อหาย่อย")
+    beta = models.BooleanField(default=True,verbose_name="อยู่ในช่วงพัฒนา")
+    body = RichTextField(verbose_name="เนื้อหา")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return '{}|{}'.format(self.title,self.text)
