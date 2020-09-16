@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/auth/register-full/', reg.as_view(), name="rest_name_register"),
     path('auth/live',Callback.as_view()),
     path('api/', include("checkin.urls")),
-    path('api/dorm/',include("dormitory.urls")),  
+    # path('api/dorm/',include("dormitory.urls")),  
     path('checkin/', fviews),
     # path('', include("checkin.api.urls")),
    # path('', include("proflie.api.urls"))
