@@ -9,6 +9,11 @@ from dormitory.serializer.serializers import (ChoiceSerializer, DormSerializer,
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
+from django.shortcuts import render
+
+ 
+def home(request):
+    return render(request, 'app/index.html')
 
 class ChoiceCreateAPIView(generics.ListCreateAPIView):
     queryset = Choice.objects.all()

@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include 
 from checkin.serializer.RegisterSerializer import UserRegistrationView as reg
 from checkin.views.frontend import home as fviews 
+from dormitory.views import home as index 
 from checkin.views.auth365 import Callback
 from django.conf.urls.static import static 
 urlpatterns = [ 
@@ -28,6 +29,6 @@ urlpatterns = [
     path('api/', include("checkin.urls")),
     path('api/dorm/',include("dormitory.urls")),  
     path('checkin/', fviews),
-    # path('', include("checkin.api.urls")),
+    path('', index),
    # path('', include("proflie.api.urls"))
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
