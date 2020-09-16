@@ -1,38 +1,38 @@
 from rest_framework import serializers
-from dormitory.models import Dormitory, Zonedorm, Typedorm, Sizedorm, Pricedorm, Pet, Makefood
+from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About)
 
-class ZonedormSerializer(serializers.ModelSerializer):
+class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Zonedorm
+        model = Choice
         fields = ('__all__')
 
-class TypedormSerializer(serializers.ModelSerializer):
+class DormSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Typedorm
+        model = Dorm
         fields = ('__all__')
 
-class SizedormSerializer(serializers.ModelSerializer):
+class DormDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Sizedorm
+        model = DormDetail
         fields = ('__all__')
 
-class PetSerializer(serializers.ModelSerializer):
+class DormStyleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Pet
+        model = DormStyle
         fields = ('__all__')
 
-class PricedormSerializer(serializers.ModelSerializer):
+class DormImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Pricedorm
+        model = DormImage
         fields = ('__all__')
 
-class MakefoodSerializer(serializers.ModelSerializer):
+class DormOwnerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Makefood
+        model = DormOwner
         fields = ('__all__')
 
-class DormitorySerializer(serializers.ModelSerializer):
-
+class AboutSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Dormitory
+        model = About
         fields = ('__all__')
+

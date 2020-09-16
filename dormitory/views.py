@@ -1,60 +1,79 @@
 from django.shortcuts import render
 from rest_framework import generics
-from dormitory.models import Zonedorm, Typedorm, Sizedorm, Pricedorm, Pet, Makefood, Dormitory
-from dormitory.serializer.serializers import (TypedormSerializer,ZonedormSerializer,SizedormSerializer,PricedormSerializer,PetSerializer,MakefoodSerializer,DormitorySerializer)
+from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About)
+from dormitory.serializer.serializers import (ChoiceSerializer, DormSerializer,
+                                              DormStyleSerializer, DormImageSerializer,
+                                              DormOwnerSerializer, AboutSerializer,
+                                              DormDetailSerializer)
+from django_filters.rest_framework import DjangoFilterBackend
 
-class ZonedormCreateAPIView(generics.ListCreateAPIView):
-    queryset = Zonedorm.objects.all()
-    serializer_class = ZonedormSerializer
+class ChoiceCreateAPIView(generics.ListCreateAPIView):
+    queryset = Choice.objects.all()
+    serializer_class = ChoiceSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('name',)
 
-class ZonedormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Zonedorm.objects.all()
-    serializer_class = ZonedormSerializer
+    # def get_queryset(self):
+    #     queryset = Choice.objects.all()
+    #     active = self.request.query_params.get('name','')
+    #     if active:
+    #         if active == "False":
+    #             active = False
+    #         elif active == "True":
+    #             active = True
+    #         else:
+    #             return queryset
+    #         return queryset.filter(is_active=active)
+    #     return queryset
 
-class TypedormCreateAPIView(generics.ListCreateAPIView):
-    queryset = Typedorm.objects.all()
-    serializer_class = TypedormSerializer
+class ChoiceDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Choice.objects.all()
+    serializer_class = ChoiceSerializer
 
-class TypedormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Typedorm.objects.all()
-    serializer_class = TypedormSerializer
+class DormCreateAPIView(generics.ListCreateAPIView):
+    queryset = Dorm.objects.all()
+    serializer_class = DormSerializer
 
-class SizedormCreateAPIView(generics.ListCreateAPIView):
-    queryset = Sizedorm.objects.all()
-    serializer_class = SizedormSerializer
+class DormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Dorm.objects.all()
+    serializer_class = DormSerializer
 
-class SizedormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Sizedorm.objects.all()
-    serializer_class = SizedormSerializer
+class DormDetailCreateAPIView(generics.ListCreateAPIView):
+    queryset = DormDetail.objects.all()
+    serializer_class = DormDetailSerializer
 
-class PricedormCreateAPIView(generics.ListCreateAPIView):
-    queryset = Pricedorm.objects.all()
-    serializer_class = PricedormSerializer
+class DormDetailDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = DormDetail.objects.all()
+    serializer_class = DormDetailSerializer
 
-class PricedormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Pricedorm.objects.all()
-    serializer_class = PricedormSerializer
+class DormImageCreateAPIView(generics.ListCreateAPIView):
+    queryset = DormImage.objects.all()
+    serializer_class = DormImageSerializer
 
-class PetCreateAPIView(generics.ListCreateAPIView):
-    queryset = Pet.objects.all()
-    serializer_class = PetSerializer
+class DormImageDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = DormImage.objects.all()
+    serializer_class = DormImageSerializer
 
-class PetDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Pet.objects.all()
-    serializer_class = PetSerializer
+class DormOwnerCreateAPIView(generics.ListCreateAPIView):
+    queryset = DormOwner.objects.all()
+    serializer_class = DormOwnerSerializer
 
-class MakefoodCreateAPIView(generics.ListCreateAPIView):
-    queryset = Makefood.objects.all()
-    serializer_class = MakefoodSerializer
+class DormOwnerDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = DormOwner.objects.all()
+    serializer_class = DormOwnerSerializer
 
-class MakefoodDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Makefood.objects.all()
-    serializer_class = MakefoodSerializer
+class DormStyleCreateAPIView(generics.ListCreateAPIView):
+    queryset = DormStyle.objects.all()
+    serializer_class = DormStyleSerializer
 
-class DormitoryCreateAPIView(generics.ListCreateAPIView):
-    queryset = Dormitory.objects.all()
-    serializer_class = DormitorySerializer
+class DormStyleDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = DormStyle.objects.all()
+    serializer_class = DormStyleSerializer
 
-class DormitoryDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Dormitory.objects.all()
-    serializer_class = DormitorySerializer
+class AboutCreateAPIView(generics.ListCreateAPIView):
+    queryset = About.objects.all()
+    serializer_class = AboutSerializer
+
+class AboutDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = About.objects.all()
+    serializer_class = AboutSerializer
