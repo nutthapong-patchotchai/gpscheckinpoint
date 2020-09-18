@@ -90,6 +90,10 @@ class DormStyle(models.Model):
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE ,verbose_name="ตัวเลือก" )
     other = models.CharField(blank=True, null=True,max_length=100,verbose_name="อื่นๆ")
 
+    def __str__(self):
+        return self.dorm.name
+    
+
 class DormImage(models.Model):
     class Meta:
         verbose_name = _("รูปภาพหอพัก")

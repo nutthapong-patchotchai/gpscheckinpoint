@@ -83,6 +83,11 @@ TEMPLATES = [
     },
 ]
  
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberagination',
+    'PAGE_SIZE': 1000
+}
 WSGI_APPLICATION = 'gpscheckin.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True

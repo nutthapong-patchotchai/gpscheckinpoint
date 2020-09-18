@@ -2,6 +2,7 @@ from django.contrib import admin
 from dormitory.models import  *
 from django.contrib.admin import SimpleListFilter
 
+
 # from dormitory.models import Zonedorm,Dormitory,Makefood,Sizedorm,Typedorm,Pet,Pricedorm
 
 # admin.site.register(Zonedorm)
@@ -80,3 +81,5 @@ class PropertiesAdmin(admin.ModelAdmin):
 admin.site.register(Dorm, PropertiesAdmin)
 
 admin.site.register(About)
+
+admin.site.register(DormStyle)

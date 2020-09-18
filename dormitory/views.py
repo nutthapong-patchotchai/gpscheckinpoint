@@ -5,34 +5,36 @@ from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, Do
 from dormitory.serializer.serializers import (ChoiceSerializer, DormSerializer,
                                               DormStyleSerializer, DormImageSerializer,
                                               DormOwnerSerializer, AboutSerializer,
-                                              DormDetailSerializer)
-from django_filters.rest_framework import DjangoFilterBackend
+                                              DormDetailSerializer,DormStyleSearchSerializer)
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from django.shortcuts import render
+from django_filters import Filter, FilterSet
+from rest_framework import viewsets
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
+from dormitory.filter import ChoiceFilter, DormStyleFilter
+from rest_framework.generics import get_object_or_404
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.response import Response
+
+
+class PostLimitOffsetPagnation(LimitOffsetPagination):
+    default_limit = 5
+    max_limit = 10
 
  
 def home(request):
     return render(request, 'app/index.html')
+    
+
+
 
 class ChoiceCreateAPIView(generics.ListCreateAPIView):
     queryset = Choice.objects.all()
     serializer_class = ChoiceSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('name',)
-
-    # def get_queryset(self):
-    #     queryset = Choice.objects.all()
-    #     active = self.request.query_params.get('name','')
-    #     if active:
-    #         if active == "False":
-    #             active = False
-    #         elif active == "True":
-    #             active = True
-    #         else:
-    #             return queryset
-    #         return queryset.filter(is_active=active)
-    #     return queryset
+    filter_class = ChoiceFilter
 
 class ChoiceDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Choice.objects.all()
@@ -45,10 +47,13 @@ class DormCreateAPIView(generics.ListCreateAPIView):
 class DormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Dorm.objects.all()
     serializer_class = DormSerializer
+    
 
 class DormDetailCreateAPIView(generics.ListCreateAPIView):
     queryset = DormDetail.objects.all()
     serializer_class = DormDetailSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('fan_price_month','fan_price_day','air_price_month','air_price_day',)
 
 class DormDetailDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = DormDetail.objects.all()
@@ -73,6 +78,7 @@ class DormOwnerDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class DormStyleCreateAPIView(generics.ListCreateAPIView):
     queryset = DormStyle.objects.all()
     serializer_class = DormStyleSerializer
+    
 
 class DormStyleDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = DormStyle.objects.all()
@@ -123,3 +129,13 @@ class TestAPIView(generics.ListCreateAPIView):
 class DormListHome(generics.ListCreateAPIView):
     queryset = Dorm.objects.all().order_by('id')[:10:1]
     serializer_class = DormSerializer
+
+
+class DormStyleSearchAPIView(generics.ListCreateAPIView):
+    queryset = DormStyle.objects.all()
+    serializer_class = DormStyleSearchSerializer
+    pagination_class = PostLimitOffsetPagnation
+    filter_backends = (DjangoFilterBackend,)
+    #เอามาจากไฟล์ filter.py
+    filter_class = DormStyleFilter
+    pagination_class = PostLimitOffsetPagnation
