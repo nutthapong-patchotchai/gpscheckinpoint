@@ -7,8 +7,10 @@ from checkin.views.views import (GPSCreateAPIView, GPSDetailAPIView,
                                  ProvinceCreateAPIView, ProvinceDetailAPIView, 
                                  AmphurCreateAPIView, AmphurDetailAPIView,
                                  DistrictCreateAPIView, DistrictDetailAPIView, ProfileFullDetailAPIView,
-                                 DistrictAllDetailAPIView,ProvinceFullDetailAPIView, PointUserDetailAPIView, GPSHistoryAPIView, GPSExistAPIView,
-                                 createcsv
+                                 DistrictAllDetailAPIView,ProvinceFullDetailAPIView, PointUserDetailAPIView, 
+                                 GPSHistoryAPIView, GPSExistAPIView,
+                                 createcsv, CutCoinAPIView, CutCoinDetailAPIView,
+                                 UserCutCoinAPIView, UserCutCoinDetailAPIView
                                  )
 
 
@@ -35,5 +37,9 @@ urlpatterns = [
     path("provincesearch/", ProvinceFullDetailAPIView.as_view(), name='provinprovincesearchce'),
     path("gps/history/<int:pk>/", GPSHistoryAPIView.as_view(), name='GPSHistoryAPIView'),
     path("gps/exist/<int:pk>/", GPSExistAPIView.as_view(), name='GPSExistAPIView'),
+    path("cut-coin/", CutCoinAPIView.as_view(), name='cut-coin'), #เพิ่มมาใหม่
+    path("cut-coin/<int:pk>/", CutCoinDetailAPIView.as_view(), name='cut-coin-detail'), #เพิ่มมาใหม่
+    path("user-cut-coin/", UserCutCoinAPIView.as_view(), name='user-cut-coin'), #เพิ่มมาใหม่
+    path("user-cut-coin/<int:pk>/", UserCutCoinDetailAPIView.as_view(), name='user-cut-coin-detail'), #เพิ่มมาใหม่
     path("doc/create", createcsv.as_view(), name='Document'),
 ]

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About)
+from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About, UserDorm)
 from django.db import models
 
 
@@ -48,5 +48,10 @@ class DormOwnerSerializer(serializers.ModelSerializer):
 class AboutSerializer(serializers.ModelSerializer):
     class Meta:
         model = About
+        fields = ('__all__')
+#เพิ่มมาใหม่
+class UserDormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDorm
         fields = ('__all__')
 

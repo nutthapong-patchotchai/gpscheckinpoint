@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.views import APIView
-from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About)
+from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner, About, UserDorm)
 from dormitory.serializer.serializers import (ChoiceSerializer, DormSerializer,
                                               DormStyleSerializer, DormImageSerializer,
                                               DormOwnerSerializer, AboutSerializer,
-                                              DormDetailSerializer,DormStyleSearchSerializer)
+                                              DormDetailSerializer,DormStyleSearchSerializer,
+                                              UserDormSerializer)
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from django.shortcuts import render
@@ -139,3 +140,12 @@ class DormStyleSearchAPIView(generics.ListCreateAPIView):
     #เอามาจากไฟล์ filter.py
     filter_class = DormStyleFilter
     pagination_class = PostLimitOffsetPagnation
+
+#เพิ่มมาใหม่
+class UserDormAPIView(generics.ListCreateAPIView):
+    queryset = UserDorm.objects.all()
+    serializer_class = UserDormSerializer
+#เพิ่มมาใหม่
+class UserDormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserDorm.objects.all()
+    serializer_class = UserDormSerializer

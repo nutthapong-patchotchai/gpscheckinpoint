@@ -2,6 +2,7 @@ from rest_framework import serializers
 from checkin.models import gps, point
 from checkin.models.user import profile
 from checkin.models.address import Geography, Province, Amphur, District
+from checkin.models.checkin import cut_coin, user_cut_coin
 from django.contrib.auth.models import User
 
 
@@ -62,4 +63,14 @@ class ProfileFullSerializer(serializers.ModelSerializer):
     district = DistrictSerializer(read_only=True)
     class Meta:
         model = profile
+        fields = ('__all__')
+#เพิ่มมาใหม่
+class CutCoinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = cut_coin
+        fields = ('__all__')
+#เพิ่มมาใหม่
+class UserCutCoinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = user_cut_coin
         fields = ('__all__')

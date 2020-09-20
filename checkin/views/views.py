@@ -4,9 +4,13 @@ from django.db.models import Count, Max
 from django.http import HttpResponse
 from rest_framework import generics
 from django.contrib.auth.models import User
-from checkin.models import gps, point, profile
+from checkin.models.user import profile
 from checkin.models.address import Geography, Province, Amphur, District
-from checkin.serializer.serializers import GpsSerializer, PointSerializer, UserSerializer, ProfileSerializer, GeographySerializer, ProvinceSerializer, AmphurSerializer, DistrictSerializer, ProfileFullSerializer
+from checkin.models.checkin import cut_coin, user_cut_coin, gps, point
+from checkin.serializer.serializers import (GpsSerializer, PointSerializer, UserSerializer, 
+                                            ProfileSerializer, GeographySerializer, ProvinceSerializer, 
+                                            AmphurSerializer, DistrictSerializer, ProfileFullSerializer,
+                                            CutCoinSerializer, UserCutCoinSerializer)
 from checkin.serializer.RegisterSerializer import UserRegistrationView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -177,7 +181,10 @@ class createcsv(APIView):
       tmp = gps.objects.all().order_by('user__email','created_at').values('id', 'user_id')
       unique = {each['user_id']: each['id'] for each in tmp}.values()
       queryset = gps.objects.filter(id__in=unique)\
-        .values('user_id','user__email','geo__name','province__name','sick1','sick2','sick3','sick4','sick5','sick6','sick7','created_at','user__profile__tel','user__profile__address2','latitude','longitude')
+        .values('user_id','user__email','geo__name','province__name',
+                'sick1','sick2','sick3','sick4','sick5','sick6','sick7',
+                'created_at','user__profile__tel','user__profile__address2',
+                'latitude','longitude')
       output = []
       for data in queryset:
         writer.writerow([
@@ -199,3 +206,25 @@ class createcsv(APIView):
         ])
       return response
 
+#เพิ่ม cutcoin เข้ามาใหม่
+class CutCoinAPIView(generics.ListCreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = cut_coin.objects.all()
+    serializer_class = CutCoinSerializer
+
+
+class CutCoinDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = cut_coin.objects.all()
+    serializer_class = CutCoinSerializer
+
+class UserCutCoinAPIView(generics.ListCreateAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = user_cut_coin.objects.all()
+    serializer_class = UserCutCoinSerializer
+
+
+class UserCutCoinDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    # permission_classes = [IsAuthenticated]
+    queryset = user_cut_coin.objects.all()
+    serializer_class = UserCutCoinSerializer

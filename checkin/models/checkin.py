@@ -71,3 +71,19 @@ class point(models.Model):
     @property
     def full_name(self):
         return "%s %s"%(self.user.first_name, self.user.last_name)
+
+#ฟังชั่นตัดcoin
+class cut_coin(models.Model):
+  title = models.CharField(max_length=150)
+  coin = models.FloatField(blank=True, null=True, default=0)
+  etc = models.CharField(max_length=150)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+
+#ฟังชั่นตัดcoin user
+class user_cut_coin(models.Model):
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+  cut_coin = models.ForeignKey(cut_coin, on_delete=models.CASCADE)
+  last_coin = models.FloatField(blank=True, null=True, default=0)
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)

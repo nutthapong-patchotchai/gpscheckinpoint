@@ -7,7 +7,7 @@ from dormitory.views import (
                               DormOwnerCreateAPIView,DormOwnerDetailAPIView,
                               DormStyleCreateAPIView,DormStyleDetailAPIView,
                               AboutCreateAPIView,AboutDetailAPIView,Test,TestAPIView,DormListHome,
-                              DormStyleSearchAPIView,
+                              DormStyleSearchAPIView,UserDormAPIView,UserDormDetailAPIView
                               )
 
 urlpatterns = [
@@ -25,6 +25,8 @@ urlpatterns = [
      path("dormstyle/<int:pk>", DormStyleDetailAPIView.as_view(), name='dormstyle-detail'),
      path("about/", AboutCreateAPIView.as_view(), name='about-list'),
      path("about/<int:pk>", AboutDetailAPIView.as_view(), name='about-detail'),
+     path("userdorm/", UserDormAPIView.as_view(), name='userdorm-list'),
+     path("userdorm/<int:pk>", UserDormDetailAPIView.as_view(), name='userdorm-detail'),
      path("test/", Test.as_view()),
      path("dorm/home/", DormListHome.as_view()),
      path("dormstyle/search/", DormStyleSearchAPIView.as_view(), name='dormstyle-search'),
