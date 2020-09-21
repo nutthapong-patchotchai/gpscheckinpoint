@@ -185,3 +185,8 @@ class getDormChoice(APIView):
         dorm = DormStyle.objects.filter(choice__in=id_choice).values_list('dorm', flat=True).all() 
         ids = {each: each for each in dorm}.values()
         return Response({"id" : ids})
+
+class getDormAll(generics.ListCreateAPIView): 
+    queryset = Dorm.objects.all()
+    serializer_class = DormSerializer 
+        

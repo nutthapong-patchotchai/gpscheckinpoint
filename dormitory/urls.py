@@ -5,7 +5,7 @@ from dormitory.views import (
                               DormDetailCreateAPIView,DormDetailDetailAPIView,
                               DormImageCreateAPIView,DormImageDetailAPIView,
                               DormOwnerCreateAPIView,DormOwnerDetailAPIView,
-                              DormStyleCreateAPIView,DormStyleDetailAPIView,
+                              DormStyleCreateAPIView,DormStyleDetailAPIView,getDormAll,
                               AboutCreateAPIView,AboutDetailAPIView,Test,TestAPIView,DormListHome,
                               DormStyleSearchAPIView,UserDormAPIView,UserDormDetailAPIView,getMyDormAPIView,getDorm,DormCreateAPIView,getDormChoice
                               )
@@ -34,4 +34,5 @@ urlpatterns = [
      path("getDorm/<int:pk>", getDorm.as_view(), name='getDorm-search'),
      path("testDorm/", DormCreateAPIView.as_view(), name='getDorm-search'), 
      path("getDormChoice/", getDormChoice.as_view(), name='getDormChoice-search'),
+     path("getDormAll/", getDormAll.as_view(), name='getDormAll-search'),
 ]
