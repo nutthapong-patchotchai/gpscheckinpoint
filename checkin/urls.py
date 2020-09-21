@@ -10,7 +10,7 @@ from checkin.views.views import (GPSCreateAPIView, GPSDetailAPIView,
                                  DistrictAllDetailAPIView,ProvinceFullDetailAPIView, PointUserDetailAPIView, 
                                  GPSHistoryAPIView, GPSExistAPIView,
                                  createcsv, CutCoinAPIView, CutCoinDetailAPIView,
-                                 UserCutCoinAPIView, UserCutCoinDetailAPIView
+                                 UserCutCoinAPIView, UserCutCoinDetailAPIView,getMyCoinAPIView
                                  )
 
 
@@ -42,4 +42,5 @@ urlpatterns = [
     path("user-cut-coin/", UserCutCoinAPIView.as_view(), name='user-cut-coin'), #เพิ่มมาใหม่
     path("user-cut-coin/<int:pk>/", UserCutCoinDetailAPIView.as_view(), name='user-cut-coin-detail'), #เพิ่มมาใหม่
     path("doc/create", createcsv.as_view(), name='Document'),
+    path("getMyCoin/<int:pk>/", getMyCoinAPIView.as_view(), name='getMyCoinAPIView-cut-coin'),
 ]

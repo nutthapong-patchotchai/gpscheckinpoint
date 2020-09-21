@@ -1,3 +1,3 @@
-from checkin.models.checkin import gps, point
+from checkin.models.checkin import *
 from checkin.models.user import profile
 from checkin.models.address import *

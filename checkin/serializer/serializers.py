@@ -74,3 +74,9 @@ class UserCutCoinSerializer(serializers.ModelSerializer):
     class Meta:
         model = user_cut_coin
         fields = ('__all__')
+
+class UserCutFullCoinSerializer(serializers.ModelSerializer):
+    cut_coin = CutCoinSerializer(read_only=True)
+    class Meta:
+        model = user_cut_coin
+        fields = ('__all__')

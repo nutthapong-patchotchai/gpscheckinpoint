@@ -2,8 +2,9 @@ from django.db import models
 from checkin.models.address import *
 from django.utils.translation import ugettext_lazy as _
 from ckeditor.fields import RichTextField
-from django.contrib.auth.models import User
+from rest_framework import serializers
 
+from django.contrib.auth.models import User 
 class Choice(models.Model): 
     class Meta:
         verbose_name = _("จัดการประเภทตัวเลือก")
@@ -52,10 +53,29 @@ class Dorm(models.Model):
     def __str__(self):
         return '{} : {}'.format(self.name,self.address)
     @property
-    def zone(self):
-        verbose_name =" รหัสไปรศณีย์"
+    def zone(self): 
         test = DormStyle.objects.filter(choice__name="โซนหอพัก").filter(dorm__id=self.id).values_list('choice__value', flat=True).first() 
         return test 
+    @property
+    def detail(self): 
+        data = DormDetail.objects.filter(dorm__id=self.id).first() 
+        data = DormDetailInSerializer(data) 
+        return data.data
+    @property
+    def owner(self): 
+        data = DormOwner.objects.filter(dorm__id=self.id).all() 
+        data = DormOwnerInSerializer(data,many=True) 
+        return data.data
+    @property
+    def image(self): 
+        data = DormImage.objects.filter(dorm__id=self.id).all() 
+        data = DormImageInSerializer(data,many=True) 
+        return data.data
+    @property
+    def style(self): 
+        data = DormStyle.objects.filter(dorm__id=self.id).values_list('choice__value', flat=True).all() 
+        # data = DormStyleInSerializer(data,many=True) 
+        return data
 
 class DormDetail(models.Model):
     class Meta:
@@ -135,7 +155,39 @@ class About(models.Model):
         return '{}|{}'.format(self.title,self.text)
 #เพิ่มมาใหม่
 class UserDorm(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    dorm = models.ForeignKey(Dorm, on_delete=models.CASCADE)
+    class Meta:
+        verbose_name = _("นิสิตในหอพัก")
+        verbose_name_plural = _("นิสิตในหอพัก")
+    user = models.ForeignKey(User, on_delete=models.CASCADE,verbose_name="นิสิต")
+    dorm = models.ForeignKey(Dorm, on_delete=models.CASCADE,verbose_name="หอพัก")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return '{}|{}'.format(self.user.first_name,self.dorm.name)
+
+    @property
+    def full_name(self):
+        return "%s %s %s"%(self.user.id, self.user.first_name, self.user.last_name) 
+    def dorm_name(self):
+        return "%s"%(self.dorm.name)
+
+
+class DormDetailInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DormDetail
+        fields = ('__all__')
+
+class DormImageInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DormImage
+        fields = ('__all__')
+
+class DormOwnerInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DormOwner
+        fields = ('__all__')
+
+class DormStyleInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DormStyle
+        fields = ('__all__')

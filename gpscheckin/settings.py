@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'ckeditor',
     # 'proflie',
+    'django_property_filter',
     'checkin',
     'dormitory', 
     'django_filters'
@@ -85,8 +86,11 @@ TEMPLATES = [
  
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberagination',
-    'PAGE_SIZE': 1000
+    'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.StandardResultsSetPagination'
+
+
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberagination',
+    # 'PAGE_SIZE': 1000
 }
 WSGI_APPLICATION = 'gpscheckin.wsgi.application'
 
@@ -102,8 +106,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'checkin',
         'USER': 'root',
-        # 'PASSWORD': 'P@$$w0rd1234',
-        'PASSWORD': '',
+        'PASSWORD': 'P@$$w0rd1234',
+        # 'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
@@ -114,7 +118,7 @@ DATABASES = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-    )
+    ), 
 }
 
 # Password validation

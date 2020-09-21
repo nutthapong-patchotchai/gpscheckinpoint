@@ -74,16 +74,39 @@ class point(models.Model):
 
 #ฟังชั่นตัดcoin
 class cut_coin(models.Model):
+  class Meta:
+        verbose_name = _("แลกแต้มสะสม")
+        verbose_name_plural = _("แลกแต้มสะสม")
   title = models.CharField(max_length=150)
   coin = models.FloatField(blank=True, null=True, default=0)
-  etc = models.CharField(max_length=150)
+  etc = models.CharField(max_length=150,default="ไม่มีรายนะเอียด")
+  status =  models.BooleanField(default=True,verbose_name="เปิดการใช้งาน")
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
+  
+  def __str__(self):
+        return self.title
 
 #ฟังชั่นตัดcoin user
 class user_cut_coin(models.Model):
+  class Meta:
+        verbose_name = _("แลกแต้มสะสมของนิสิต")
+        verbose_name_plural = _("แลกแต้มสะสมของนิสิต")
   user = models.ForeignKey(User, on_delete=models.CASCADE)
-  cut_coin = models.ForeignKey(cut_coin, on_delete=models.CASCADE)
+  cut_coin = models.ForeignKey(cut_coin, on_delete=models.CASCADE,verbose_name="แลกแต้มสะสม")
   last_coin = models.FloatField(blank=True, null=True, default=0)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
+  def __str__(self):
+        return self.cut_coin.title
+  @property
+  def full_name(self):
+        return "%s %s"%(self.user.first_name, self.user.last_name)
+  @property
+  def coin_score(self):
+        return "%s"%(self.cut_coin.coin)
+  @property
+  def coin(self):
+        return "%s"%(self.cut_coin.title)
+
+

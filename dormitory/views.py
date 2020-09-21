@@ -5,7 +5,7 @@ from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, Do
 from dormitory.serializer.serializers import (ChoiceSerializer, DormSerializer,
                                               DormStyleSerializer, DormImageSerializer,
                                               DormOwnerSerializer, AboutSerializer,
-                                              DormDetailSerializer,DormStyleSearchSerializer,
+                                              DormDetailSerializer,DormStyleSearchSerializer,DormFullSerializer,
                                               UserDormSerializer)
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -14,14 +14,22 @@ from django_filters import Filter, FilterSet
 from rest_framework import viewsets
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from dormitory.filter import ChoiceFilter, DormStyleFilter
+from dormitory.filter import ChoiceFilter, DormStyleFilter, BookFilterSet
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 from rest_framework.response import Response
 
+from rest_framework import filters
 
-class PostLimitOffsetPagnation(LimitOffsetPagination):
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size' 
+
+
+class PostLimitOffsetPagnation(PageNumberPagination):
     default_limit = 5
+    page_size_query_param = 'page_size'
+
     max_limit = 10
 
  
@@ -47,7 +55,7 @@ class DormCreateAPIView(generics.ListCreateAPIView):
 
 class DormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Dorm.objects.all()
-    serializer_class = DormSerializer
+    serializer_class = DormFullSerializer
     
 
 class DormDetailCreateAPIView(generics.ListCreateAPIView):
@@ -129,7 +137,7 @@ class TestAPIView(generics.ListCreateAPIView):
 
 class DormListHome(generics.ListCreateAPIView):
     queryset = Dorm.objects.all().order_by('id')[:10:1]
-    serializer_class = DormSerializer
+    serializer_class = DormFullSerializer
 
 
 class DormStyleSearchAPIView(generics.ListCreateAPIView):
@@ -149,3 +157,31 @@ class UserDormAPIView(generics.ListCreateAPIView):
 class UserDormDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserDorm.objects.all()
     serializer_class = UserDormSerializer
+
+class getMyDormAPIView(APIView): 
+    def get(self, request,pk, format=None):
+        queryset = UserDorm.objects.filter(user__id=pk).order_by('-created_at')
+        serializer = UserDormSerializer(queryset,many=True) 
+        return Response(serializer.data)
+
+class getDorm(APIView): 
+    def get(self, request,pk, format=None):
+        queryset = Dorm.objects.all().order_by('id')
+        serializer = DormFullSerializer(queryset,many=True) 
+        return Response(serializer.data)
+
+class DormCreateAPIView(generics.ListCreateAPIView):
+    queryset = Dorm.objects.all()
+    serializer_class = DormFullSerializer    
+    filter_backends = (DjangoFilterBackend,filters.SearchFilter) 
+    filter_class = BookFilterSet
+    search_fields = ['name']
+    pagination_class = LargeResultsSetPagination
+
+class getDormChoice(APIView): 
+    def get(self, request, format=None):
+        id_choice = request.GET["id"]
+        id_choice = id_choice.split(',')
+        dorm = DormStyle.objects.filter(choice__in=id_choice).values_list('dorm', flat=True).all() 
+        ids = {each: each for each in dorm}.values()
+        return Response({"id" : ids})

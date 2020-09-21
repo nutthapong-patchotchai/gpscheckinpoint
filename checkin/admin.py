@@ -1,10 +1,24 @@
 from django.contrib import admin
 from .models import point, gps
-from .models import point, gps  
-from .models import Geography, Province  , Amphur ,District ,profile
+from .models import point, gps, cut_coin,user_cut_coin
+from .models import Geography, Province, Amphur ,District, profile 
 from django.contrib.auth.models import User
 
 admin.site.site_header = 'ระบบ อ.ว. การโควิด'
+
+class user_cut_coinAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['user','cut_coin']
+    search_fields = ['coin','full_name','cut_coin']
+    list_display = ('full_name','coin','coin_score','created_at','updated_at') 
+    list_filter = ('cut_coin',)
+admin.site.register(user_cut_coin,user_cut_coinAdmin)
+
+
+class cut_coinAdmin(admin.ModelAdmin):
+    search_fields = ['title','coin','status']
+    list_display = ('title','coin','etc','status','created_at','updated_at')
+    list_filter = ('status',)
+admin.site.register(cut_coin,cut_coinAdmin)
 
 class profileAdmin(admin.ModelAdmin):
     search_fields = ['address']

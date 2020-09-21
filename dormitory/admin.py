@@ -13,6 +13,14 @@ from django.contrib.admin import SimpleListFilter
 # admin.site.register(Pet)
 # admin.site.register(Pricedorm)
 
+class UserDormAdmin(admin.ModelAdmin):  
+    search_fields = ['full_name','dorm__id','id',]
+    list_display = ('full_name','dorm_name','created_at')
+    list_filter = ('dorm__name',)
+
+
+ 
+admin.site.register(UserDorm,UserDormAdmin)
 
 class ChoiceAdmin(admin.ModelAdmin):  
     search_fields = ['name','value','id',]

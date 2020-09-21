@@ -55,3 +55,12 @@ class UserDormSerializer(serializers.ModelSerializer):
         model = UserDorm
         fields = ('__all__')
 
+class DormFullSerializer(serializers.ModelSerializer):
+    zone = serializers.ReadOnlyField()
+    detail = serializers.ReadOnlyField()
+    owner = serializers.ReadOnlyField()
+    image = serializers.ReadOnlyField()
+    style = serializers.ReadOnlyField()
+    class Meta:
+        model = Dorm
+        fields = ('__all__')

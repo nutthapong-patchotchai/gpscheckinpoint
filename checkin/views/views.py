@@ -9,7 +9,7 @@ from checkin.models.address import Geography, Province, Amphur, District
 from checkin.models.checkin import cut_coin, user_cut_coin, gps, point
 from checkin.serializer.serializers import (GpsSerializer, PointSerializer, UserSerializer, 
                                             ProfileSerializer, GeographySerializer, ProvinceSerializer, 
-                                            AmphurSerializer, DistrictSerializer, ProfileFullSerializer,
+                                            AmphurSerializer, DistrictSerializer, ProfileFullSerializer,UserCutFullCoinSerializer,
                                             CutCoinSerializer, UserCutCoinSerializer)
 from checkin.serializer.RegisterSerializer import UserRegistrationView
 from rest_framework.response import Response
@@ -228,3 +228,10 @@ class UserCutCoinDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     # permission_classes = [IsAuthenticated]
     queryset = user_cut_coin.objects.all()
     serializer_class = UserCutCoinSerializer
+
+
+class getMyCoinAPIView(APIView): 
+    def get(self, request,pk, format=None):
+        queryset = user_cut_coin.objects.filter(user__id=pk).order_by('-created_at')
+        serializer = UserCutFullCoinSerializer(queryset,many=True) 
+        return Response(serializer.data)
