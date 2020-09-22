@@ -71,3 +71,12 @@ class BookFilterSet(PropertyFilterSet):
         return queryset.filter(
             Q(zone=id) | Q(id=zone)
         )
+#อันใหม่วันที่ 22/09/2020
+class ZoneFilter(PropertyFilterSet):
+    id = PropertyNumberFilter(field_name='id')
+    zone = PropertyCharFilter(field_name='zone')
+
+
+    class Meta:
+        model = Dorm
+        fields = ['zone','id']

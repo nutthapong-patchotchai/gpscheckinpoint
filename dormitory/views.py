@@ -6,7 +6,7 @@ from dormitory.serializer.serializers import (ChoiceSerializer, DormSerializer,
                                               DormStyleSerializer, DormImageSerializer,
                                               DormOwnerSerializer, AboutSerializer,
                                               DormDetailSerializer,DormStyleSearchSerializer,DormFullSerializer,
-                                              UserDormSerializer)
+                                              UserDormSerializer,ZoneLatLong)
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from django.shortcuts import render
@@ -14,7 +14,7 @@ from django_filters import Filter, FilterSet
 from rest_framework import viewsets
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from dormitory.filter import ChoiceFilter, DormStyleFilter, BookFilterSet
+from dormitory.filter import ChoiceFilter, DormStyleFilter, BookFilterSet, ZoneFilter
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 from rest_framework.response import Response
@@ -190,3 +190,9 @@ class getDormAll(generics.ListCreateAPIView):
     queryset = Dorm.objects.all()
     serializer_class = DormSerializer 
         
+#อันใหม่วันที่ 22/09/2020        
+class getlatlong(generics.ListAPIView):
+    queryset = Dorm.objects.all()
+    serializer_class = ZoneLatLong
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = ZoneFilter

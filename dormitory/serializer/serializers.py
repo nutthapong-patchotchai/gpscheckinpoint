@@ -64,3 +64,9 @@ class DormFullSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dorm
         fields = ('__all__')
+
+class ZoneLatLong(serializers.ModelSerializer):
+    zone = serializers.ReadOnlyField()
+    class Meta:
+        model = Dorm
+        fields = ('id','zone','latitude','longitude')

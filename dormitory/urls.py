@@ -7,7 +7,8 @@ from dormitory.views import (
                               DormOwnerCreateAPIView,DormOwnerDetailAPIView,
                               DormStyleCreateAPIView,DormStyleDetailAPIView,getDormAll,
                               AboutCreateAPIView,AboutDetailAPIView,Test,TestAPIView,DormListHome,
-                              DormStyleSearchAPIView,UserDormAPIView,UserDormDetailAPIView,getMyDormAPIView,getDorm,DormCreateAPIView,getDormChoice
+                              DormStyleSearchAPIView,UserDormAPIView,UserDormDetailAPIView,getMyDormAPIView,getDorm,DormCreateAPIView,getDormChoice,
+                              getlatlong
                               )
 
 urlpatterns = [
@@ -35,4 +36,5 @@ urlpatterns = [
      path("testDorm/", DormCreateAPIView.as_view(), name='getDorm-search'), 
      path("getDormChoice/", getDormChoice.as_view(), name='getDormChoice-search'),
      path("getDormAll/", getDormAll.as_view(), name='getDormAll-search'),
+     path("getlatlong/", getlatlong.as_view()), #อันใหม่วันที่ 22/09/2020
 ]
