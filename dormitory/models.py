@@ -73,7 +73,7 @@ class Dorm(models.Model):
         return data.data
     @property
     def style(self): 
-        data = DormStyle.objects.filter(dorm__id=self.id).values_list('choice__value', flat=True).all() 
+        data = DormStyle.objects.filter(dorm__id=self.id).values_list('choice__name','choice__value').all() 
         # data = DormStyleInSerializer(data,many=True) 
         return data
 
