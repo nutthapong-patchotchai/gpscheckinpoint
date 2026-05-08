@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}เช็คอิน | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <p class="eyebrow">Check-in</p>
+    <h1>บันทึกการเช็คอิน</h1>
+    <p>ระบบจะพยายามอ่านตำแหน่งจากเบราว์เซอร์ให้ก่อน หรือกรอกพิกัดเองได้ถ้าต้องการทดสอบ local</p>
+  </section>
+
+  <section class="content-layout">
+    <form class="form-surface checkin-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>ตำแหน่ง</h2>
+          <button class="button small secondary" type="button" data-location-button>อ่านตำแหน่ง</button>
+        </div>
+        <div class="form-grid two">
+          <div class="field full-span">
+            <label for="{{ form.place_name.id_for_label }}">{{ form.place_name.label }}</label>
+            {{ form.place_name }}
+            {{ form.place_name.errors }}
+          </div>
+          <div class="field full-span">
+            <label for="{{ form.place_address.id_for_label }}">{{ form.place_address.label }}</label>
+            {{ form.place_address }}
+            {{ form.place_address.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.latitude.id_for_label }}">{{ form.latitude.label }}</label>
+            {{ form.latitude }}
+            {{ form.latitude.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.longitude.id_for_label }}">{{ form.longitude.label }}</label>
+            {{ form.longitude }}
+            {{ form.longitude.errors }}
+          </div>
+        </div>
+        <p class="help-text" data-location-status>ยังไม่ได้อ่านตำแหน่ง</p>
+        <div class="location-preview" data-location-preview hidden></div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>ที่อยู่</h2>
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="{{ form.geo.id_for_label }}">{{ form.geo.label }}</label>
+            {{ form.geo }}
+            {{ form.geo.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.province.id_for_label }}">{{ form.province.label }}</label>
+            {{ form.province }}
+            {{ form.province.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.amphur.id_for_label }}">{{ form.amphur.label }}</label>
+            {{ form.amphur }}
+            {{ form.amphur.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.district.id_for_label }}">{{ form.district.label }}</label>
+            {{ form.district }}
+            {{ form.district.errors }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>อาการ</h2>
+        </div>
+        <div class="symptom-grid">
+          {% for field in form %}
+            {% if field.name in form.symptom_fields %}
+              <label class="check-tile" for="{{ field.id_for_label }}">
+                {{ field }}
+                <span>{{ field.label }}</span>
+              </label>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="button primary" type="submit">บันทึกเช็คอิน</button>
+        <a class="button secondary" href="{% url 'checkin_history' %}">ดูประวัติ</a>
+      </div>
+    </form>
+
+    <aside class="side-panel">
+      <div class="mini-wallet">
+        <span class="summary-label">เหรียญของฉัน</span>
+        <strong>{{ wallet.balance }} เหรียญ</strong>
+        <small>เช็คอินต่อเนื่อง {{ wallet.current_streak }} วัน · แลกแล้ว {{ wallet.activity_hours|floatformat:1 }} ชม.</small>
+        <a class="button secondary full" href="{% url 'coins' %}">แลกชั่วโมงกิจกรรม</a>
+      </div>
+
+      <h2>เช็คอินล่าสุด</h2>
+      {% if latest_checkins %}
+        <ol class="timeline">
+          {% for item in latest_checkins %}
+            <li>
+              <time>{{ item.created_at|date:"d/m/Y H:i" }}</time>
+              <span>{{ item.location_label }}</span>
+              {% if item.coin_awarded %}
+                <small class="coin-note">+{{ item.coins_awarded }} เหรียญ · streak {{ item.streak_day }} วัน</small>
+              {% else %}
+                <small class="muted">ไม่ได้รับเหรียญเพิ่ม</small>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <p class="muted">ยังไม่มีประวัติการเช็คอิน</p>
+      {% endif %}
+    </aside>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const locationButton = document.querySelector("[data-location-button]");
+    const locationStatus = document.querySelector("[data-location-status]");
+    const locationPreview = document.querySelector("[data-location-preview]");
+    const placeNameInput = document.querySelector("#{{ form.place_name.id_for_label }}");
+    const placeAddressInput = document.querySelector("#{{ form.place_address.id_for_label }}");
+    const latitudeInput = document.querySelector("#{{ form.latitude.id_for_label }}");
+    const longitudeInput = document.querySelector("#{{ form.longitude.id_for_label }}");
+    const geoSelect = document.querySelector("#{{ form.geo.id_for_label }}");
+    const provinceSelect = document.querySelector("#{{ form.province.id_for_label }}");
+    const amphurSelect = document.querySelector("#{{ form.amphur.id_for_label }}");
+    const districtSelect = document.querySelector("#{{ form.district.id_for_label }}");
+
+    function setSelectValue(select, value) {
+      if (!select || value === null || value === undefined) {
+        return;
+      }
+      select.value = String(value);
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    async function resolveLocation(latitude, longitude) {
+      const params = new URLSearchParams({
+        lat: latitude,
+        lng: longitude,
+      });
+      const response = await fetch("{% url 'resolve_location' %}?" + params.toString(), {
+        headers: { "Accept": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("resolve failed");
+      }
+      return response.json();
+    }
+
+    if (locationButton) {
+      locationButton.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          locationStatus.textContent = "เบราว์เซอร์นี้ไม่รองรับการอ่านตำแหน่ง";
+          return;
+        }
+
+        locationStatus.textContent = "กำลังอ่านตำแหน่ง...";
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const latitude = position.coords.latitude.toFixed(6);
+            const longitude = position.coords.longitude.toFixed(6);
+            latitudeInput.value = latitude;
+            longitudeInput.value = longitude;
+            locationStatus.textContent = "อ่านตำแหน่งสำเร็จ กำลังค้นหาชื่อสถานที่...";
+
+            try {
+              const data = await resolveLocation(latitude, longitude);
+              placeNameInput.value = data.place_name || "";
+              placeAddressInput.value = data.address || "";
+              setSelectValue(geoSelect, data.geo && data.geo.id);
+              setSelectValue(provinceSelect, data.province && data.province.id);
+              setSelectValue(amphurSelect, data.amphur && data.amphur.id);
+              setSelectValue(districtSelect, data.district && data.district.id);
+
+              if (locationPreview) {
+                locationPreview.hidden = false;
+                const title = document.createElement("strong");
+                const address = document.createElement("span");
+                const distance = document.createElement("small");
+                title.textContent = data.place_name || "ไม่พบชื่อสถานที่";
+                address.textContent = data.address || "";
+                distance.textContent = `ใกล้ที่สุดในข้อมูลระบบ ประมาณ ${data.distance_km} กม.`;
+                locationPreview.replaceChildren(title, address, distance);
+              }
+              locationStatus.textContent = "เติมชื่อสถานที่และที่อยู่ให้อัตโนมัติแล้ว";
+            } catch (error) {
+              if (locationPreview) {
+                locationPreview.hidden = true;
+              }
+              locationStatus.textContent = "อ่านพิกัดได้ แต่ยังเทียบชื่อสถานที่ไม่ได้ สามารถกรอกเองได้";
+            }
+          },
+          () => {
+            locationStatus.textContent = "อ่านตำแหน่งไม่ได้ สามารถกรอกเองได้";
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      });
+    }
+  </script>
+{% endblock %}

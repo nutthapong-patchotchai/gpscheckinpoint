@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from checkin.models.address import *
-from django.utils.translation import ugettext_lazy as _
+from checkin.models.address import Amphur, District, Geography, Province
+from django.utils.translation import gettext_lazy as _
  
 
 def get_first_name(self):
@@ -20,6 +20,7 @@ class profile(models.Model):
     province = models.ForeignKey(Province, on_delete=models.CASCADE) 
     post = models.TextField()
     tel = models.TextField()
+    faculty = models.CharField(max_length=160, blank=True, default="", verbose_name="คณะ")
     question1 = models.IntegerField()
     question2 = models.IntegerField()
     question3 = models.IntegerField()

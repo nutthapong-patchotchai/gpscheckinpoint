@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}ออกจากระบบ | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="empty-state standalone">
+    <h1>ออกจากระบบแล้ว</h1>
+    <p>กลับเข้าสู่ระบบได้เมื่อต้องการเช็คอินหรือดูประวัติ</p>
+    <a class="button primary" href="{% url 'login' %}">เข้าสู่ระบบ</a>
+  </section>
+{% endblock %}

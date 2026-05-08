@@ -1,8 +1,5 @@
 from rest_framework import serializers
 from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About, UserDorm)
-from django.db import models
-
-
 
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:

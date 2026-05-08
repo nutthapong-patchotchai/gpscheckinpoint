@@ -1,17 +1,22 @@
-from django.db.models import Q
-from django_filters import Filter, FilterSet
-from dormitory.models import (Choice, Dorm, DormDetail, DormStyle, DormImage, DormOwner ,About)
-from django_property_filter import PropertyFilterSet, PropertyNumberFilter,RangeFilter,PropertyBaseFilter,PropertyLookupChoiceFilter, PropertyCharFilter,PropertyAllValuesFilter,PropertyBaseInFilter,PropertyChoiceFilter
+from django_filters import CharFilter, Filter, FilterSet, NumberFilter
+from dormitory.models import Choice, Dorm, DormStyle
+
+
+def split_values(value):
+    if not value:
+        return []
+    if isinstance(value, str):
+        return [item.strip() for item in value.split(',') if item.strip()]
+    return value
 
 #ค้นหาแบบหลายค่าพร้อมๆกัน โดยใช้ , ครั้นไว้
 class ListFilter(Filter):
     def filter(self, qs, value):
-        if not value:
+        values = split_values(value)
+        if not values:
             return qs
 
-        self.lookup_expr = 'in'
-        values = value.split(',')
-        return super(ListFilter, self).filter(qs, values)
+        return qs.filter(**{f'{self.field_name}__in': values})
 
 #ค้นหาแบบหลายค่าพร้อมๆกัน โดยใช้ , ครั้นไว้ และ ค้นหาแบบหลายtableพร้อมๆกัน โดยใช้ & ครั้นไว้ ใช้กับ Choice
 class ChoiceFilter(FilterSet):
@@ -22,11 +27,6 @@ class ChoiceFilter(FilterSet):
         model = Choice
         fields = ['name', 'value']
         
-    def filter_both(self, queryset, name, value):
-        return queryset.filter(
-            Q(name=value) | Q(value=value)
-        )
-        
 #ค้นหาแบบหลายค่าพร้อมๆกัน โดยใช้ , ครั้นไว้ และ ค้นหาแบบหลายtableพร้อมๆกัน โดยใช้ & ครั้นไว้ ใช้กับ DormStyle
 class DormStyleFilter(FilterSet):
     name = ListFilter(field_name='dorm')
@@ -36,47 +36,39 @@ class DormStyleFilter(FilterSet):
         model = DormStyle
         fields = ['dorm', 'choice__value']
         
-    def filter_both(self, queryset, name, value):
-        return queryset.filter(
-            Q(name=value) | Q(value=value)
-        )
-
-
-class ListFilterProperty(PropertyBaseInFilter):
-    def filter(self, qs, value):
-        if not value:
-            return qs
-
-        self.lookup_expr = 'in'
-        values = value.split(',')
-        return super(ListFilterProperty, self).filter(qs, values)
-
-class ListFilterArrProperty(PropertyBaseInFilter):
-    def filter(self, qs, value):
-        if not value:
-            return qs
-
-        self.lookup_expr = 'in'
-        values = value.split(',')
-        return super(ListFilterArrProperty, self).filter(qs, values)
-
-class BookFilterSet(PropertyFilterSet):
+class BookFilterSet(FilterSet):
     id  = ListFilter(field_name='id') 
-    zone = ListFilterProperty(field_name='zone')
+    zone = Filter(method='filter_zone')
+
     class Meta:
         model = Dorm
         fields = ['id','zone']
-        
-    def filter_both(self, queryset, zone, id):
-        return queryset.filter(
-            Q(zone=id) | Q(id=zone)
-        )
-#อันใหม่วันที่ 22/09/2020
-class ZoneFilter(PropertyFilterSet):
-    id = PropertyNumberFilter(field_name='id')
-    zone = PropertyCharFilter(field_name='zone')
 
+    def filter_zone(self, queryset, name, value):
+        values = split_values(value)
+        if not values:
+            return queryset
+        dorm_ids = DormStyle.objects.filter(
+            choice__name="โซนหอพัก",
+            choice__value__in=values,
+        ).values_list('dorm_id', flat=True)
+        return queryset.filter(id__in=dorm_ids)
+
+#อันใหม่วันที่ 22/09/2020
+class ZoneFilter(FilterSet):
+    id = NumberFilter(field_name='id')
+    zone = CharFilter(method='filter_zone')
 
     class Meta:
         model = Dorm
         fields = ['zone','id']
+
+    def filter_zone(self, queryset, name, value):
+        values = split_values(value)
+        if not values:
+            return queryset
+        dorm_ids = DormStyle.objects.filter(
+            choice__name="โซนหอพัก",
+            choice__value__in=values,
+        ).values_list('dorm_id', flat=True)
+        return queryset.filter(id__in=dorm_ids)

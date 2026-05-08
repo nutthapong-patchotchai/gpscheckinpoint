@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from checkin.models import gps, point
+from checkin.models import CoinTransaction, CoinWallet, gps, point
 from checkin.models.user import profile
 from checkin.models.address import Geography, Province, Amphur, District
 from checkin.models.checkin import cut_coin, user_cut_coin
@@ -24,6 +24,7 @@ class GpsSerializer(serializers.ModelSerializer):
     class Meta:
         model = gps
         exclude = ("id",)
+        read_only_fields = ("coin_awarded", "coins_awarded", "streak_day")
 
 
 class PointSerializer(serializers.ModelSerializer):
@@ -74,9 +75,22 @@ class UserCutCoinSerializer(serializers.ModelSerializer):
     class Meta:
         model = user_cut_coin
         fields = ('__all__')
+        read_only_fields = ("last_coin", "coin_spent", "activity_hours", "balance_after", "status")
 
 class UserCutFullCoinSerializer(serializers.ModelSerializer):
     cut_coin = CutCoinSerializer(read_only=True)
     class Meta:
         model = user_cut_coin
+        fields = ('__all__')
+
+
+class CoinWalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoinWallet
+        fields = ('__all__')
+
+
+class CoinTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoinTransaction
         fields = ('__all__')

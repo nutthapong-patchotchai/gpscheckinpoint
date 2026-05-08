@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}เหรียญและชั่วโมงกิจกรรม | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="page-heading compact">
+    <p class="eyebrow">Coins</p>
+    <h1>เหรียญและชั่วโมงกิจกรรม</h1>
+    <p>เช็คอินครั้งแรกของแต่ละวันเพื่อรับเหรียญ ยิ่งเช็คอินต่อเนื่องก็ยิ่งได้โบนัสมากขึ้น</p>
+  </section>
+
+  <section class="wallet-hero" aria-label="สรุปเหรียญ">
+    <div>
+      <span class="summary-label">ยอดคงเหลือ</span>
+      <strong>{{ wallet.balance }} เหรียญ</strong>
+      <small>ได้รับทั้งหมด {{ wallet.total_earned }} เหรียญ · ใช้ไป {{ wallet.total_spent }} เหรียญ</small>
+    </div>
+    <div class="coin-stat-grid">
+      <article>
+        <span>เช็คอินต่อเนื่อง</span>
+        <strong>{{ wallet.current_streak }} วัน</strong>
+      </article>
+      <article>
+        <span>สถิติสูงสุด</span>
+        <strong>{{ wallet.longest_streak }} วัน</strong>
+      </article>
+      <article>
+        <span>ชั่วโมงกิจกรรม</span>
+        <strong>{{ wallet.activity_hours|floatformat:1 }} ชม.</strong>
+      </article>
+    </div>
+  </section>
+
+  <section class="my-redemptions-section" aria-label="รายการแลกของฉัน">
+    <div class="section-title">
+      <div>
+        <p class="eyebrow">My redemptions</p>
+        <h2>รายการแลกของฉัน</h2>
+      </div>
+    </div>
+    {% if redemptions %}
+      <ol class="redeem-list prominent">
+        {% for item in redemptions %}
+          <li>
+            <div>
+              <strong>{{ item.cut_coin.title }}</strong>
+              <small>{{ item.created_at|date:"d/m/Y H:i" }}</small>
+            </div>
+            <span>{{ item.activity_hours|floatformat:1 }} ชม.</span>
+            <small>ใช้ {{ item.coin_spent }} เหรียญ · คงเหลือ {{ item.balance_after }} เหรียญ</small>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <div class="empty-redemptions">
+        <strong>ยังไม่เคยแลกชั่วโมงกิจกรรม</strong>
+        <span>เมื่อแลกสำเร็จ รายการล่าสุดจะแสดงตรงนี้ทันที</span>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="coin-layout">
+    <div>
+      <div class="section-title">
+        <h2>แลกชั่วโมงกิจกรรม</h2>
+      </div>
+      {% if rewards %}
+        <div class="reward-grid">
+          {% for reward in rewards %}
+            <article class="reward-card {% if wallet.balance < reward.coin %}locked{% endif %}">
+              <div>
+                <span class="summary-label">{{ reward.activity_hours|floatformat:1 }} ชั่วโมง</span>
+                <h3>{{ reward.title }}</h3>
+                <p>{{ reward.etc }}</p>
+              </div>
+              <div class="reward-cost">
+                <strong>{{ reward.coin|floatformat:0 }} เหรียญ</strong>
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="reward_id" value="{{ reward.id }}">
+                  <button class="button primary full" type="submit" {% if wallet.balance < reward.coin %}disabled{% endif %}>
+                    แลกรายการนี้
+                  </button>
+                </form>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h2>ยังไม่มีรายการแลก</h2>
+          <p>เพิ่มรายการแลกได้จากหน้า admin</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <aside class="coin-side">
+      <section>
+        <h2>ประวัติเหรียญล่าสุด</h2>
+        {% if transactions %}
+          <ol class="transaction-list">
+            {% for item in transactions %}
+              <li>
+                <div>
+                  <strong>{{ item.get_transaction_type_display }}</strong>
+                  <small>{{ item.created_at|date:"d/m/Y H:i" }}{% if item.note %} · {{ item.note }}{% endif %}</small>
+                </div>
+                <span class="transaction-amount {% if item.amount > 0 %}positive{% else %}negative{% endif %}">
+                  {% if item.amount > 0 %}+{% endif %}{{ item.amount }}
+                </span>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p class="muted">ยังไม่มีประวัติเหรียญ</p>
+        {% endif %}
+      </section>
+
+    </aside>
+  </section>
+{% endblock %}

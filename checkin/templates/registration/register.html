@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}สมัครสมาชิก | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="auth-page register-page">
+    <div class="auth-copy register-copy">
+      <p class="eyebrow">Create account</p>
+      <h1>สมัครสมาชิก</h1>
+      <p>สร้างบัญชีสำหรับใช้งานระบบเช็คอินบนเครื่อง local ข้อมูลที่อยู่ช่วยให้โปรไฟล์พร้อมใช้งานกับหน้า admin และ API เดิม</p>
+
+      <div class="register-summary" aria-label="สิ่งที่จะได้หลังสมัคร">
+        <div>
+          <strong>1</strong>
+          <span>บัญชี local</span>
+        </div>
+        <div>
+          <strong>2</strong>
+          <span>เข้าสู่ระบบอัตโนมัติ</span>
+        </div>
+        <div>
+          <strong>3</strong>
+          <span>พร้อมเช็คอิน</span>
+        </div>
+      </div>
+    </div>
+
+    <form class="form-surface auth-form register-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>บัญชีผู้ใช้</h2>
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+            {{ form.username }}
+            {% if form.username.help_text %}
+              <p class="help-text field-help">{{ form.username.help_text }}</p>
+            {% endif %}
+            {{ form.username.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>ข้อมูลส่วนตัว</h2>
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.tel.id_for_label }}">{{ form.tel.label }}</label>
+            {{ form.tel }}
+            {{ form.tel.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.faculty.id_for_label }}">{{ form.faculty.label }}</label>
+            {{ form.faculty }}
+            {{ form.faculty.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.address2.id_for_label }}">{{ form.address2.label }}</label>
+            {{ form.address2 }}
+            {{ form.address2.errors }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>ที่อยู่</h2>
+        </div>
+        <div class="form-grid two">
+          <div class="field full-span">
+            <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+            {{ form.address }}
+            {{ form.address.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.geo.id_for_label }}">{{ form.geo.label }}</label>
+            {{ form.geo }}
+            {{ form.geo.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.province.id_for_label }}">{{ form.province.label }}</label>
+            {{ form.province }}
+            {{ form.province.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.amphur.id_for_label }}">{{ form.amphur.label }}</label>
+            {{ form.amphur }}
+            {{ form.amphur.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.district.id_for_label }}">{{ form.district.label }}</label>
+            {{ form.district }}
+            {{ form.district.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.post.id_for_label }}">{{ form.post.label }}</label>
+            {{ form.post }}
+            {{ form.post.errors }}
+          </div>
+        </div>
+        <p class="help-text">ถ้าเลือกภูมิภาค จังหวัด อำเภอ และตำบลครบ ระบบจะสร้างโปรไฟล์ให้พร้อมบัญชี</p>
+      </div>
+
+      <div class="form-actions register-actions">
+        <button class="button primary" type="submit">สร้างบัญชีและเข้าสู่ระบบ</button>
+        <a class="button secondary" href="{% url 'login' %}">มีบัญชีแล้ว</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

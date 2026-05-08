@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}ประวัติเช็คอิน | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="page-heading compact">
+    <p class="eyebrow">History</p>
+    <h1>ประวัติการเช็คอิน</h1>
+    <p>ข้อมูลผู้ใช้ หอพักปัจจุบัน และรายการเช็คอินล่าสุด</p>
+  </section>
+
+  <section class="profile-summary" aria-label="ข้อมูลผู้ใช้">
+    <article>
+      <span class="summary-label">ผู้ใช้</span>
+      <strong>{{ user.get_full_name|default:user.username }}</strong>
+      <small>{{ user.email|default:user.username }}</small>
+    </article>
+    <article>
+      <span class="summary-label">คณะ</span>
+      <strong>{{ user_profile.faculty|default:"-" }}</strong>
+      <small>ข้อมูลจากโปรไฟล์</small>
+    </article>
+    <article>
+      <span class="summary-label">หอพักปัจจุบัน</span>
+      {% if current_dorm %}
+        <strong>{{ current_dorm.dorm.name }}</strong>
+        <small>{{ current_dorm.dorm.district.name }} อ.{{ current_dorm.dorm.amphur.name }} จ.{{ current_dorm.dorm.province.name }}</small>
+      {% elif user_profile.address2 %}
+        <strong>{{ user_profile.address2 }}</strong>
+        <small>ข้อมูลจากโปรไฟล์</small>
+      {% else %}
+        <strong>-</strong>
+        <small>ยังไม่ได้ระบุหอพัก</small>
+      {% endif %}
+    </article>
+    <article>
+      <span class="summary-label">เหรียญและชั่วโมงกิจกรรม</span>
+      <strong>{{ wallet.balance }} เหรียญ</strong>
+      <small>ต่อเนื่อง {{ wallet.current_streak }} วัน · แลกแล้ว {{ wallet.activity_hours|floatformat:1 }} ชม.</small>
+    </article>
+  </section>
+
+  <section class="history-map-section" aria-label="แผนที่เช็คอินย้อนหลัง 14 วัน">
+    <div class="map-header">
+      <div>
+        <p class="eyebrow">Phayao map</p>
+        <h2>ตำแหน่งที่ไปมาในพะเยา 14 วันล่าสุด</h2>
+      </div>
+      <span>{{ map_points|length }} จุด</span>
+    </div>
+
+    <div class="map-layout">
+      <div class="phayao-map-card">
+        <div class="phayao-map">
+          <svg viewBox="0 0 100 100" role="img" aria-label="แผนที่จังหวัดพะเยาแบบจำลอง">
+            <path class="province-shape" d="M43 5 L62 10 L76 23 L88 44 L82 67 L67 87 L45 96 L25 86 L12 67 L8 43 L18 21 Z"></path>
+            <ellipse class="lake-shape" cx="40" cy="52" rx="12" ry="19"></ellipse>
+            <path class="main-road" d="M36 96 C39 78 42 63 44 48 C47 31 54 19 62 10"></path>
+            <path class="main-road secondary" d="M12 67 C29 60 45 56 63 48 C74 43 82 37 88 31"></path>
+            {% if map_path_points %}
+              <polyline class="checkin-route" points="{{ map_path_points }}"></polyline>
+            {% endif %}
+          </svg>
+
+          {% for point in map_points %}
+            <span
+              class="map-pin {% if point.has_symptom %}warning{% endif %}"
+              style="left: {{ point.x }}%; top: {{ point.y }}%;"
+              title="{{ point.place_name }} - {{ point.created_at|date:'d/m/Y H:i' }}"
+            >
+              {{ forloop.counter }}
+            </span>
+          {% endfor %}
+
+          <span class="map-label city">เมืองพะเยา</span>
+          <span class="map-label lake">กว๊านพะเยา</span>
+          <span class="map-label campus">ม.พะเยา / แม่กา</span>
+        </div>
+      </div>
+
+      <aside class="map-list">
+        {% if map_points %}
+          <ol>
+            {% for point in map_points %}
+              <li>
+                <span class="map-list-index {% if point.has_symptom %}warning{% endif %}">{{ forloop.counter }}</span>
+                <div>
+                  <strong>{{ point.place_name }}</strong>
+                  <small>{{ point.created_at|date:"d/m/Y H:i" }} · ต.{{ point.district }} อ.{{ point.amphur }}</small>
+                </div>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <div class="empty-map">
+            <strong>ยังไม่มีพิกัดใน 14 วันล่าสุด</strong>
+            <span>เมื่อมีการเช็คอินพร้อม latitude/longitude จุดจะแสดงบนแผนที่นี้</span>
+          </div>
+        {% endif %}
+      </aside>
+    </div>
+  </section>
+
+  <section class="table-surface">
+    {% if checkins %}
+      <table>
+        <thead>
+          <tr>
+            <th>วันที่</th>
+            <th>ชื่อสถานที่</th>
+            <th>พิกัด</th>
+            <th>พื้นที่</th>
+            <th>เหรียญ</th>
+            <th>อาการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in checkins %}
+            <tr>
+              <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+              <td>
+                <strong>{{ item.location_label }}</strong>
+                {% if item.place_address %}
+                  <small class="table-subtext">{{ item.place_address }}</small>
+                {% endif %}
+              </td>
+              <td>{{ item.latitude|default:"-" }}, {{ item.longitude|default:"-" }}</td>
+              <td>
+                {{ item.district.name|default:"-" }}
+                {% if item.amphur %} อ.{{ item.amphur.name }}{% endif %}
+                {% if item.province %} จ.{{ item.province.name }}{% endif %}
+              </td>
+              <td>
+                {% if item.coin_awarded %}
+                  <span class="tag coin">+{{ item.coins_awarded }}</span>
+                  <small class="table-subtext">streak {{ item.streak_day }} วัน</small>
+                {% else %}
+                  <span class="muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if item.sick7 %}
+                  ปกติ
+                {% else %}
+                  {% if item.sick1 %}<span class="tag">ไข้</span>{% endif %}
+                  {% if item.sick2 %}<span class="tag">ไอ</span>{% endif %}
+                  {% if item.sick3 %}<span class="tag">น้ำมูก</span>{% endif %}
+                  {% if item.sick4 %}<span class="tag">เจ็บคอ</span>{% endif %}
+                  {% if item.sick5 %}<span class="tag">หายใจลำบาก</span>{% endif %}
+                  {% if item.sick6 %}<span class="tag">ไม่ได้กลิ่น</span>{% endif %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <h2>ยังไม่มีประวัติเช็คอิน</h2>
+        <p>เมื่อบันทึกเช็คอินแล้ว รายการจะแสดงในหน้านี้</p>
+        <a class="button primary" href="{% url 'checkin_home' %}">ไปเช็คอิน</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

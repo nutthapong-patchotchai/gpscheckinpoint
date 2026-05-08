@@ -1,7 +1,6 @@
 from django.db import models
-from checkin.models.address import *
-from django.utils.translation import ugettext_lazy as _
-from ckeditor.fields import RichTextField
+from checkin.models.address import Amphur, District, Geography, Province
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from django.contrib.auth.models import User 
@@ -148,7 +147,7 @@ class About(models.Model):
     title = models.CharField(max_length=255,verbose_name="หัวข้อ")
     text = models.CharField(max_length=255,verbose_name="เนื้อหาย่อย")
     beta = models.BooleanField(default=True,verbose_name="อยู่ในช่วงพัฒนา")
-    body = RichTextField(verbose_name="เนื้อหา")
+    body = models.TextField(verbose_name="เนื้อหา")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):

@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}UP Checkin{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{% url 'home' %}">
+      <span class="brand-logo">
+        <img src="/media/admin-interface/logo/member-04-up.png" alt="UP">
+      </span>
+      <span>
+        <strong>UP Checkin</strong>
+        <small>Local Django</small>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="เมนูหลัก">
+      <a href="{% url 'home' %}">หอพัก</a>
+      <a href="{% url 'checkin_home' %}">เช็คอิน</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'checkin_history' %}">ประวัติ</a>
+        <a href="{% url 'coins' %}">เหรียญ</a>
+        {% if user.is_staff %}
+          <a href="{% url 'admin:index' %}">ผู้ดูแล</a>
+        {% endif %}
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit">ออกจากระบบ</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">เข้าสู่ระบบ</a>
+        <a class="nav-cta" href="{% url 'register' %}">สมัครสมาชิก</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main>
+    {% if messages %}
+      <section class="messages" aria-label="ข้อความแจ้งเตือน">
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </section>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <span>UP Checkin สำหรับรัน local</span>
+    <span>ใช้ Django templates และ Django auth มาตรฐาน</span>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

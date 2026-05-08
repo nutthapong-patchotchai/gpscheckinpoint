@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}หอพัก | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="hero-section">
+    <div class="hero-copy">
+      <p class="eyebrow">Django local app</p>
+      <h1>ระบบเช็คอินและข้อมูลหอพัก</h1>
+      <p>
+        หน้าเว็บชุดใหม่นี้ใช้ Django templates ทั้งหมด เข้าสู่ระบบด้วยชื่อผู้ใช้และรหัสผ่านปกติ
+        พร้อมใช้งานบนเครื่อง local ได้ทันที
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="{% url 'checkin_home' %}">เริ่มเช็คอิน</a>
+        {% if not user.is_authenticated %}
+          <a class="button secondary" href="{% url 'login' %}">เข้าสู่ระบบ</a>
+        {% endif %}
+      </div>
+    </div>
+    <aside class="status-panel" aria-label="ภาพรวมระบบ">
+      <img src="/media/admin-interface/logo/member-04-up.png" alt="" class="panel-logo">
+      <div>
+        <span class="stat-number">{{ public_dorm_count }}</span>
+        <span class="stat-label">หอพักที่เผยแพร่</span>
+      </div>
+      <div class="stat-grid">
+        <div>
+          <strong>{{ dorm_count }}</strong>
+          <span>ทั้งหมด</span>
+        </div>
+        <div>
+          <strong>{{ checkin_count }}</strong>
+          <span>เช็คอิน</span>
+        </div>
+      </div>
+      {% if latest_checkin %}
+        <p class="muted">เช็คอินล่าสุดของคุณ: {{ latest_checkin.created_at|date:"d/m/Y H:i" }}</p>
+      {% else %}
+        <p class="muted">ยังไม่มีประวัติเช็คอินล่าสุดสำหรับผู้ใช้นี้</p>
+      {% endif %}
+    </aside>
+  </section>
+
+  <section class="section-header">
+    <div>
+      <p class="eyebrow">Dormitory</p>
+      <h2>รายการหอพัก</h2>
+    </div>
+    <form class="search-form" method="get">
+      <label for="q">ค้นหาหอพัก</label>
+      <div class="search-row">
+        <input id="q" name="q" type="search" value="{{ query }}" placeholder="ชื่อหอพัก, จังหวัด, เบอร์โทร">
+        <button type="submit">ค้นหา</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="dorm-grid" aria-label="รายการหอพัก">
+    {% for dorm in dorms %}
+      <article class="dorm-card">
+        <div class="dorm-card-header">
+          <span class="dorm-zone">โซน {{ dorm.zone|default:"-" }}</span>
+          <span class="dorm-status">เผยแพร่</span>
+        </div>
+        <h3>{{ dorm.name }}</h3>
+        <p>{{ dorm.address|truncatechars:130 }}</p>
+        <dl class="info-list">
+          <div>
+            <dt>พื้นที่</dt>
+            <dd>{{ dorm.district.name|default:"-" }} {{ dorm.amphur.name|default:"" }}</dd>
+          </div>
+          <div>
+            <dt>จังหวัด</dt>
+            <dd>{{ dorm.province.name|default:"-" }}</dd>
+          </div>
+          <div>
+            <dt>โทร</dt>
+            <dd>{{ dorm.tel|default:"-" }}</dd>
+          </div>
+        </dl>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <h3>ไม่พบข้อมูลหอพัก</h3>
+        <p>ลองเปลี่ยนคำค้นหา หรือเพิ่มข้อมูลผ่านหน้า admin ก่อนใช้งาน</p>
+      </div>
+    {% endfor %}
+  </section>
+{% endblock %}

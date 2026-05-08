@@ -1,8 +1,7 @@
-import csv,io
+import csv
 
-from django.db.models import Count, Max
 from django.http import HttpResponse
-from rest_framework import generics
+from rest_framework import generics, status
 from django.contrib.auth.models import User
 from checkin.models.user import profile
 from checkin.models.address import Geography, Province, Amphur, District
@@ -11,13 +10,17 @@ from checkin.serializer.serializers import (GpsSerializer, PointSerializer, User
                                             ProfileSerializer, GeographySerializer, ProvinceSerializer, 
                                             AmphurSerializer, DistrictSerializer, ProfileFullSerializer,UserCutFullCoinSerializer,
                                             CutCoinSerializer, UserCutCoinSerializer)
-from checkin.serializer.RegisterSerializer import UserRegistrationView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.utils.timezone import datetime #important if using timezones
-from datetime import datetime, time
+from datetime import datetime
 import datetime as docdate 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from checkin.services import (
+    CoinError,
+    InsufficientCoins,
+    award_daily_checkin_coins,
+    redeem_activity_reward,
+)
 
 class UserCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -66,6 +69,10 @@ class GPSCreateAPIView(generics.ListCreateAPIView):
     queryset = gps.objects.all()
     serializer_class = GpsSerializer
 
+    def perform_create(self, serializer):
+        checkin = serializer.save()
+        award_daily_checkin_coins(checkin)
+
 
 class GPSDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
@@ -80,37 +87,43 @@ class GPSHistoryAPIView(APIView):
         return Response(serializer.data) 
 
 class GPSExistAPIView(APIView): 
+    permission_classes = [IsAuthenticated]
     def get(self, request,pk, format=None): 
         today = datetime.now().date()
         queryset = gps.objects.filter(user__id=pk,created_at__gte=today).exists()
-        serializer = GpsSerializer(queryset,many=True) 
         return Response({"result":queryset}) 
 
 
 class PointCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = point.objects.all()
     serializer_class = PointSerializer
 
 
 class PointDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = point.objects.all()
     serializer_class = PointSerializer
 
 class PointUserDetailAPIView(APIView): 
+    permission_classes = [IsAuthenticated]
     def get(self, request,pk, format=None):
         queryset = point.objects.filter(user__id=pk).order_by('-updated_at')
         serializer = PointSerializer(queryset,many=True) 
         return Response(serializer.data)
 
 class GeoCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Geography.objects.all()
     serializer_class = GeographySerializer
 
 class GeoDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Geography.objects.all()
     serializer_class = GeographySerializer
 
 class ProvinceCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Province.objects.all()
     serializer_class = ProvinceSerializer
 
@@ -121,6 +134,7 @@ class ProvinceDetailAPIView(APIView):
         return Response( serializer.data)
 
 class AmphurCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = Amphur.objects.all()
     serializer_class = AmphurSerializer
 
@@ -131,6 +145,7 @@ class AmphurDetailAPIView(APIView):
         return Response(serializer.data)
 
 class DistrictCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
 
@@ -141,6 +156,7 @@ class DistrictDetailAPIView(APIView):
         return Response(serializer.data)
 
 class DistrictAllDetailAPIView(generics.RetrieveUpdateDestroyAPIView): 
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
 
@@ -167,6 +183,8 @@ def phoneFormat(num):
         dd = "0"+dd
     return dd
 class createcsv(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request,format=None):
 
       response = HttpResponse(content_type='text/csv')
@@ -185,7 +203,6 @@ class createcsv(APIView):
                 'sick1','sick2','sick3','sick4','sick5','sick6','sick7',
                 'created_at','user__profile__tel','user__profile__address2',
                 'latitude','longitude')
-      output = []
       for data in queryset:
         writer.writerow([
             splitStr(data['user__email']),
@@ -208,29 +225,59 @@ class createcsv(APIView):
 
 #เพิ่ม cutcoin เข้ามาใหม่
 class CutCoinAPIView(generics.ListCreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = cut_coin.objects.all()
     serializer_class = CutCoinSerializer
 
 
 class CutCoinDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = cut_coin.objects.all()
     serializer_class = CutCoinSerializer
 
 class UserCutCoinAPIView(generics.ListCreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = user_cut_coin.objects.all()
     serializer_class = UserCutCoinSerializer
 
+    def create(self, request, *args, **kwargs):
+        reward_id = request.data.get("cut_coin")
+        if not reward_id:
+            return Response({"detail": "กรุณาเลือกรายการแลก"}, status=status.HTTP_400_BAD_REQUEST)
+
+        reward = cut_coin.objects.filter(pk=reward_id, status=True).first()
+        if reward is None:
+            return Response({"detail": "ไม่พบรายการแลกที่เปิดใช้งาน"}, status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        requested_user_id = request.data.get("user")
+        if requested_user_id and str(requested_user_id) != str(request.user.id):
+            if not request.user.is_staff:
+                return Response({"detail": "ไม่สามารถแลกให้ผู้ใช้อื่นได้"}, status=status.HTTP_403_FORBIDDEN)
+            user = User.objects.filter(pk=requested_user_id).first()
+            if user is None:
+                return Response({"detail": "ไม่พบผู้ใช้"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            redemption = redeem_activity_reward(user, reward)
+        except InsufficientCoins:
+            return Response({"detail": "เหรียญไม่พอสำหรับแลกรายการนี้"}, status=status.HTTP_400_BAD_REQUEST)
+        except CoinError as error:
+            return Response({"detail": str(error)}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(redemption)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class UserCutCoinDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = user_cut_coin.objects.all()
     serializer_class = UserCutCoinSerializer
 
 
 class getMyCoinAPIView(APIView): 
+    permission_classes = [IsAuthenticated]
+
     def get(self, request,pk, format=None):
         queryset = user_cut_coin.objects.filter(user__id=pk).order_by('-created_at')
         serializer = UserCutFullCoinSerializer(queryset,many=True) 

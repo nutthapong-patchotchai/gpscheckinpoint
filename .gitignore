@@ -1,5 +1,8 @@
 /venv/
+/env/
+.env
+/.idea/
+/.vscode/
 /static/
 db.sqlite3
 __pycache__/
-__pycache__ 
