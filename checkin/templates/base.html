@@ -25,6 +25,7 @@
         <a href="{% url 'checkin_history' %}">ประวัติ</a>
         <a href="{% url 'coins' %}">เหรียญ</a>
         {% if user.is_staff %}
+          <a href="{% url 'tracing_dashboard' %}">COVID Timeline</a>
           <a href="{% url 'admin:index' %}">ผู้ดูแล</a>
         {% endif %}
         <form action="{% url 'logout' %}" method="post">

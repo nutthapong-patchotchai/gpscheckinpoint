@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.db import models
 
 from django.contrib.auth.models import User
 from checkin.models.address import Amphur, District, Geography, Province
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -222,3 +225,79 @@ class CoinTransaction(models.Model):
 
     def __str__(self):
         return "%s %s (%s)" % (self.user.username, self.amount, self.get_transaction_type_display())
+
+
+class CovidCase(models.Model):
+    class Meta:
+        verbose_name = _("เคส COVID-19")
+        verbose_name_plural = _("เคส COVID-19")
+        ordering = ("-updated_at", "-created_at")
+
+    STATUS_SUSPECTED = "suspected"
+    STATUS_CONFIRMED = "confirmed"
+    STATUS_RECOVERED = "recovered"
+    STATUS_CLEARED = "cleared"
+
+    STATUS_CHOICES = (
+        (STATUS_SUSPECTED, "เฝ้าระวัง/สงสัยติดเชื้อ"),
+        (STATUS_CONFIRMED, "ยืนยันติดเชื้อ"),
+        (STATUS_RECOVERED, "หายแล้ว"),
+        (STATUS_CLEARED, "ไม่พบเชื้อ/ปิดเคส"),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="covid_cases", verbose_name="ผู้ใช้")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_SUSPECTED,
+        verbose_name="สถานะเคส",
+    )
+    symptom_started_on = models.DateField(blank=True, null=True, verbose_name="วันที่เริ่มมีอาการ")
+    confirmed_on = models.DateField(blank=True, null=True, verbose_name="วันที่ตรวจพบ/ยืนยัน")
+    trace_start_date = models.DateField(blank=True, null=True, verbose_name="เริ่มไล่ timeline")
+    trace_end_date = models.DateField(blank=True, null=True, verbose_name="สิ้นสุดการไล่ timeline")
+    notes = models.TextField(blank=True, default="", verbose_name="หมายเหตุ")
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="created_covid_cases",
+        verbose_name="ผู้บันทึกเคส",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def owner_name(self):
+        return self.user.get_full_name() or self.user.username
+
+    @property
+    def effective_trace_start_date(self):
+        if self.trace_start_date:
+            return self.trace_start_date
+
+        date_candidates = [
+            date_value
+            for date_value in (self.symptom_started_on, self.confirmed_on)
+            if date_value
+        ]
+        if date_candidates:
+            return min(date_candidates) - timedelta(days=14)
+        return timezone.localdate() - timedelta(days=14)
+
+    @property
+    def effective_trace_end_date(self):
+        if self.trace_end_date:
+            return self.trace_end_date
+        return self.confirmed_on or timezone.localdate()
+
+    @property
+    def trace_window_label(self):
+        return "%s - %s" % (
+            self.effective_trace_start_date.strftime("%d/%m/%Y"),
+            self.effective_trace_end_date.strftime("%d/%m/%Y"),
+        )
+
+    def __str__(self):
+        return "%s (%s)" % (self.owner_name, self.get_status_display())

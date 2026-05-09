@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CoinTransaction, CoinWallet, cut_coin, gps, point, user_cut_coin
+from .models import CovidCase, CoinTransaction, CoinWallet, cut_coin, gps, point, user_cut_coin
 from .models import Geography, Province, Amphur ,District, profile 
 from django.contrib.auth.models import User
 
@@ -33,6 +33,15 @@ class CoinTransactionAdmin(admin.ModelAdmin):
     list_display = ('user','transaction_type','amount','balance_after','streak_day','note','created_at')
     list_filter = ('transaction_type','created_at')
 admin.site.register(CoinTransaction,CoinTransactionAdmin)
+
+
+class CovidCaseAdmin(admin.ModelAdmin):
+    autocomplete_fields = ['user','created_by']
+    search_fields = ['user__username','user__first_name','user__last_name','user__email','notes']
+    list_display = ('owner_name','status','symptom_started_on','confirmed_on','trace_start_date','trace_end_date','created_by','updated_at')
+    list_filter = ('status','confirmed_on','created_at')
+    readonly_fields = ('created_at','updated_at')
+admin.site.register(CovidCase,CovidCaseAdmin)
 
 class profileAdmin(admin.ModelAdmin):
     search_fields = ['address', 'faculty', 'user__first_name', 'user__last_name', 'user__username']

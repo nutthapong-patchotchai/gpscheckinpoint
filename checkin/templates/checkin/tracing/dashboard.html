@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}COVID Timeline | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="page-heading compact with-actions">
+    <div>
+      <p class="eyebrow">COVID tracing</p>
+      <h1>ศูนย์ไล่ Timeline</h1>
+      <p>สำหรับเจ้าหน้าที่บันทึกเคส COVID-19 ใน scope มหาวิทยาลัยพะเยา และเปิดดู timeline/contact ที่เกี่ยวข้อง</p>
+    </div>
+    <a class="button primary" href="{% url 'tracing_case_create' %}">เพิ่มเคส</a>
+  </section>
+
+  <section class="profile-summary">
+    <article>
+      <span class="summary-label">เคสทั้งหมด</span>
+      <strong>{{ overview.total_cases }}</strong>
+      <small>รายการที่บันทึกในระบบ</small>
+    </article>
+    <article>
+      <span class="summary-label">ยืนยันติดเชื้อ</span>
+      <strong>{{ overview.confirmed_cases }}</strong>
+      <small>สถานะ confirmed</small>
+    </article>
+    <article>
+      <span class="summary-label">เฝ้าระวัง</span>
+      <strong>{{ overview.suspected_cases }}</strong>
+      <small>สถานะ suspected</small>
+    </article>
+    <article>
+      <span class="summary-label">วิธีใช้งาน</span>
+      <strong>เลือกเคส</strong>
+      <small>ระบบจะหา contact จากสถานที่ พิกัด วันเวลา และหอพัก</small>
+    </article>
+  </section>
+
+  <section class="table-surface">
+    {% if cases %}
+      <table>
+        <thead>
+          <tr>
+            <th>ผู้ใช้</th>
+            <th>สถานะ</th>
+            <th>ช่วงไล่ Timeline</th>
+            <th>วันที่ตรวจพบ</th>
+            <th>ผู้บันทึก</th>
+            <th>อัปเดตล่าสุด</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cases %}
+            <tr>
+              <td>
+                <strong>{{ item.owner_name }}</strong>
+                <small class="table-subtext">{{ item.user.email|default:item.user.username }}</small>
+              </td>
+              <td><span class="tag status-{{ item.status }}">{{ item.get_status_display }}</span></td>
+              <td>{{ item.trace_window_label }}</td>
+              <td>{{ item.confirmed_on|date:"d/m/Y"|default:"-" }}</td>
+              <td>
+                {% if item.created_by %}
+                  {{ item.created_by.get_full_name|default:item.created_by.username }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ item.updated_at|date:"d/m/Y H:i" }}</td>
+              <td>
+                <a class="button small secondary" href="{% url 'tracing_case_detail' item.pk %}">เปิด</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <h2>ยังไม่มีเคส COVID-19</h2>
+        <p>เริ่มจากเพิ่มเคสแรก แล้วระบบจะดึง timeline จากประวัติเช็คอินของผู้ใช้นั้น</p>
+        <a class="button primary" href="{% url 'tracing_case_create' %}">เพิ่มเคส</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

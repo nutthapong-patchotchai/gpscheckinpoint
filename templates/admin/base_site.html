@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('UP Checkin Admin') }}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin_dashboard/admin.css' %}">
+{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<script src="{% static 'admin_dashboard/admin.js' %}" defer></script>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} up-admin{% endblock %}
+
+{% block branding %}
+<div id="site-name" class="up-admin-brand">
+  <a href="{% url 'admin:index' %}">
+    <span class="up-admin-brand-mark">UP</span>
+    <span>
+      <strong>{{ site_header|default:_('UP Checkin Admin') }}</strong>
+      <small>Operations dashboard</small>
+    </span>
+  </a>
+</div>
+{% endblock %}
+
+{% block userlinks %}
+  {% if site_url %}
+    <a href="{{ site_url }}">{% translate 'View site' %}</a>
+  {% endif %}
+  {% if user.has_usable_password %}
+    <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a>
+  {% endif %}
+  <div class="up-admin-theme-switch" role="group" aria-label="Theme">
+    <button type="button" data-dashboard-theme="light">Light</button>
+    <button type="button" data-dashboard-theme="dark">Dark</button>
+  </div>
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% csrf_token %}
+    <button type="submit">{% translate 'Log out' %}</button>
+  </form>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

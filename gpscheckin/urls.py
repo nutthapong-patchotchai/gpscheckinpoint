@@ -29,6 +29,13 @@ from checkin.views.frontend import home as checkin_home
 from checkin.views.frontend import coins as coins_view
 from checkin.views.frontend import register as register_view
 from checkin.views.frontend import resolve_location
+from checkin.views.tracing import (
+    case_create as tracing_case_create,
+    case_detail as tracing_case_detail,
+    case_export_csv as tracing_case_export_csv,
+    case_update as tracing_case_update,
+    dashboard as tracing_dashboard,
+)
 from dormitory.views import home as index
 
 urlpatterns = [
@@ -56,6 +63,11 @@ urlpatterns = [
     path('api/', include("checkin.urls")),
     path('api/dorm/', include("dormitory.urls")),
     path('coins/', coins_view, name='coins'),
+    path('tracing/', tracing_dashboard, name='tracing_dashboard'),
+    path('tracing/cases/new/', tracing_case_create, name='tracing_case_create'),
+    path('tracing/cases/<int:pk>/', tracing_case_detail, name='tracing_case_detail'),
+    path('tracing/cases/<int:pk>/edit/', tracing_case_update, name='tracing_case_update'),
+    path('tracing/cases/<int:pk>/export.csv', tracing_case_export_csv, name='tracing_case_export_csv'),
     path('checkin/resolve-location/', resolve_location, name='resolve_location'),
     path('checkin/history/', checkin_history, name='checkin_history'),
     path('checkin/', checkin_home, name='checkin_home'),

@@ -4,7 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, User
 from django.contrib.auth.models import User
 
 from checkin.models.address import Amphur, District, Geography, Province
-from checkin.models.checkin import gps
+from checkin.models.checkin import CovidCase, gps
 from checkin.models.user import profile
 
 
@@ -305,3 +305,53 @@ class CheckinForm(forms.Form):
             sick6=int(data.get("sick6")),
             sick7=int(data.get("sick7")),
         )
+
+
+class CovidCaseForm(forms.ModelForm):
+    user = forms.ModelChoiceField(
+        label="ผู้ใช้",
+        queryset=User.objects.all().order_by("username"),
+        widget=forms.Select(attrs={"class": INPUT_CLASS}),
+    )
+
+    class Meta:
+        model = CovidCase
+        fields = (
+            "user",
+            "status",
+            "symptom_started_on",
+            "confirmed_on",
+            "trace_start_date",
+            "trace_end_date",
+            "notes",
+        )
+        labels = {
+            "status": "สถานะเคส",
+            "symptom_started_on": "วันที่เริ่มมีอาการ",
+            "confirmed_on": "วันที่ตรวจพบ/ยืนยัน",
+            "trace_start_date": "เริ่มไล่ timeline",
+            "trace_end_date": "สิ้นสุดการไล่ timeline",
+            "notes": "หมายเหตุ",
+        }
+        widgets = {
+            "status": forms.Select(attrs={"class": INPUT_CLASS}),
+            "symptom_started_on": forms.DateInput(attrs={"class": INPUT_CLASS, "type": "date"}),
+            "confirmed_on": forms.DateInput(attrs={"class": INPUT_CLASS, "type": "date"}),
+            "trace_start_date": forms.DateInput(attrs={"class": INPUT_CLASS, "type": "date"}),
+            "trace_end_date": forms.DateInput(attrs={"class": INPUT_CLASS, "type": "date"}),
+            "notes": forms.Textarea(
+                attrs={
+                    "class": INPUT_CLASS,
+                    "rows": 4,
+                    "placeholder": "เช่น รายละเอียดการสัมภาษณ์ หรือข้อสังเกตของเจ้าหน้าที่",
+                }
+            ),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get("trace_start_date")
+        end_date = cleaned_data.get("trace_end_date")
+        if start_date and end_date and end_date < start_date:
+            raise forms.ValidationError("วันที่สิ้นสุด timeline ต้องไม่อยู่ก่อนวันที่เริ่มต้น")
+        return cleaned_data

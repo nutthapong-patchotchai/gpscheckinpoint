@@ -1,0 +1,229 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_dashboard %}
+
+{% block coltype %}colMS up-dashboard-col{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard up-admin-dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block content %}
+{% admin_dashboard_metrics as metrics %}
+{% admin_dashboard_chart 7 as chart_items %}
+{% recent_checkins 5 as checkins %}
+{% recent_cases 4 as cases %}
+{% recent_admin_actions 6 as actions %}
+{% admin_dashboard_counts as dashboard_counts %}
+
+<div class="up-dashboard-layout">
+  <aside class="up-dashboard-sidebar" aria-label="Admin sections">
+    <div class="up-sidebar-title">
+      <span class="up-sidebar-logo">UP</span>
+      <div>
+        <strong>Admin Console</strong>
+        <small>GPS Checkin Point</small>
+      </div>
+    </div>
+    <nav class="up-sidebar-nav">
+      <a class="is-active" href="{% url 'admin:index' %}"><span>DB</span> Dashboard</a>
+      <a href="{% url 'admin:auth_user_changelist' %}"><span>US</span> Users</a>
+      <a href="{% url 'admin:checkin_gps_changelist' %}"><span>CI</span> Check-ins</a>
+      <a href="{% url 'admin:checkin_covidcase_changelist' %}"><span>TL</span> COVID Timeline</a>
+      <a href="{% url 'admin:checkin_coinwallet_changelist' %}"><span>CW</span> Coins</a>
+      <a href="{% url 'admin:dormitory_dorm_changelist' %}"><span>DM</span> Dormitory</a>
+    </nav>
+    <div class="up-sidebar-help">
+      <strong>Quick access</strong>
+      <small>Tracing center and CSV exports</small>
+      <a href="{% url 'tracing_dashboard' %}">Open tracing center</a>
+    </div>
+  </aside>
+
+  <section class="up-dashboard-main" aria-label="Dashboard">
+    <div class="up-dashboard-topbar">
+      <div>
+        <p class="up-eyebrow">Dashboard</p>
+        <h1>UP Checkin Control Center</h1>
+      </div>
+      <div class="up-dashboard-search">
+        <label for="admin-dashboard-search">Search admin modules</label>
+        <input id="admin-dashboard-search" data-dashboard-search type="search" placeholder="Search users, check-ins, dorms...">
+      </div>
+    </div>
+
+    <div class="up-hero-grid">
+      <article class="up-hero-card up-hero-card-main">
+        <div>
+          <p class="up-eyebrow">Built for staff</p>
+          <h2>จัดการระบบเช็คอิน หอพัก เหรียญ และ COVID timeline ในหน้าเดียว</h2>
+          <p>ลิงก์และตัวเลขใน dashboard นี้ดึงจาก Django admin จริง ใช้ค้นหา model, เปิดรายการ, เพิ่มข้อมูล และตรวจ activity ล่าสุดได้ทันที</p>
+          <a class="up-link-button" href="{% url 'checkin_home' %}">Open check-in</a>
+        </div>
+        <div class="up-hero-visual" aria-hidden="true">
+          <span>UP</span>
+          <strong>GPS</strong>
+          <small>Checkin</small>
+        </div>
+      </article>
+      <article class="up-hero-card up-hero-card-dark">
+        <p class="up-eyebrow">Timeline center</p>
+        <h2>COVID tracing workflow</h2>
+        <p>สร้างเคส, ตรวจ timeline, ดู contact risk และ export CSV สำหรับส่งต่อเจ้าหน้าที่</p>
+        <a href="{% url 'tracing_dashboard' %}">Open tracing</a>
+      </article>
+    </div>
+
+    <section class="up-stat-grid" aria-label="System metrics">
+      {% for metric in metrics %}
+        <a class="up-stat-card tone-{{ metric.tone }}" href="{{ metric.url }}">
+          <span class="up-stat-icon">{{ metric.icon }}</span>
+          <small>{{ metric.label }}</small>
+          <strong>{{ metric.value|compact_number }}</strong>
+          <em>{{ metric.meta }}</em>
+        </a>
+      {% endfor %}
+    </section>
+
+    <div class="up-dashboard-panels">
+      <section class="up-panel up-chart-panel">
+        <div class="up-panel-header">
+          <div>
+            <p class="up-eyebrow">Check-in trend</p>
+            <h2>7 วันล่าสุด</h2>
+          </div>
+          <a href="{% url 'admin:checkin_gps_changelist' %}">View all</a>
+        </div>
+        <div class="up-bar-chart" aria-label="Check-ins over the last 7 days">
+          {% for item in chart_items %}
+            <div class="up-bar-item">
+              <div class="up-bar-track">
+                <span style="height: {{ item.height }}%"></span>
+              </div>
+              <strong>{{ item.value }}</strong>
+              <small>{{ item.label }}</small>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="up-panel">
+        <div class="up-panel-header">
+          <div>
+            <p class="up-eyebrow">Latest check-ins</p>
+            <h2>รายการล่าสุด</h2>
+          </div>
+          <a href="{% url 'admin:checkin_gps_changelist' %}">Manage</a>
+        </div>
+        <div class="up-activity-list">
+          {% for item in checkins %}
+            <a href="{% url 'admin:checkin_gps_change' item.pk %}">
+              <span class="up-avatar">{{ item.user.username|slice:":2"|upper }}</span>
+              <span>
+                <strong>{{ item.location_label }}</strong>
+                <small>{{ item.user.get_full_name|default:item.user.username }} · {{ item.created_at|date:"d/m/Y H:i" }}</small>
+              </span>
+            </a>
+          {% empty %}
+            <p class="up-empty-state">ยังไม่มีรายการเช็คอิน</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <div class="up-dashboard-panels">
+      <section class="up-panel">
+        <div class="up-panel-header">
+          <div>
+            <p class="up-eyebrow">COVID cases</p>
+            <h2>เคสล่าสุด</h2>
+          </div>
+          <a href="{% url 'admin:checkin_covidcase_changelist' %}">Manage</a>
+        </div>
+        <div class="up-case-list">
+          {% for case in cases %}
+            <a href="{% url 'admin:checkin_covidcase_change' case.pk %}">
+              <span class="up-risk-pill status-{{ case.status }}">{{ case.get_status_display }}</span>
+              <strong>{{ case.owner_name }}</strong>
+              <small>{{ case.trace_window_label }}</small>
+            </a>
+          {% empty %}
+            <p class="up-empty-state">ยังไม่มีเคส COVID-19</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="up-panel">
+        <div class="up-panel-header">
+          <div>
+            <p class="up-eyebrow">System coverage</p>
+            <h2>ข้อมูลที่เปิดใช้งาน</h2>
+          </div>
+        </div>
+        <div class="up-mini-grid">
+          <a href="{% url 'admin:dormitory_dorm_changelist' %}"><strong>{{ dashboard_counts.dorms|compact_number }}</strong><small>หอพัก</small></a>
+          <a href="{% url 'admin:dormitory_userdorm_changelist' %}"><strong>{{ dashboard_counts.user_dorms|compact_number }}</strong><small>นิสิตในหอพัก</small></a>
+          <a href="{% url 'admin:checkin_user_cut_coin_changelist' %}"><strong>{{ dashboard_counts.redemptions|compact_number }}</strong><small>รายการแลก</small></a>
+          <a href="{% url 'admin:checkin_coinwallet_changelist' %}"><strong>{{ dashboard_counts.wallets|compact_number }}</strong><small>wallet</small></a>
+        </div>
+        <div class="up-action-list">
+          {% for entry in actions %}
+            <span>
+              <strong>{{ entry.object_repr }}</strong>
+              <small>{{ entry.user.get_username }} · {{ entry.action_time|timesince }} ago</small>
+            </span>
+          {% empty %}
+            <p class="up-empty-state">ยังไม่มี admin activity</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <section class="up-panel up-admin-modules" data-dashboard-modules>
+      <div class="up-panel-header">
+        <div>
+          <p class="up-eyebrow">Modules</p>
+          <h2>จัดการข้อมูลทั้งหมด</h2>
+        </div>
+        <span class="up-module-hint">Search filters this list</span>
+      </div>
+
+      {% if app_list %}
+        <div class="up-module-grid">
+          {% for app in app_list %}
+            <article class="up-module-group" data-dashboard-app>
+              <header>
+                <h3>{{ app.name }}</h3>
+                <a href="{{ app.app_url }}">Open app</a>
+              </header>
+              <div class="up-module-list">
+                {% for model in app.models %}
+                  {% model_object_count app.app_label model.object_name as object_count %}
+                  {% model_icon model.object_name as icon %}
+                  <div class="up-module-row" data-dashboard-model>
+                    <a class="up-module-main" href="{{ model.admin_url|default:'#' }}">
+                      <span>{{ icon }}</span>
+                      <strong>{{ model.name }}</strong>
+                      <small>{{ object_count|compact_number }} records</small>
+                    </a>
+                    <div class="up-module-actions">
+                      {% if model.add_url %}
+                        <a href="{{ model.add_url }}">Add</a>
+                      {% endif %}
+                      {% if model.admin_url %}
+                        <a href="{{ model.admin_url }}">View</a>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+        <p class="up-empty-state" data-dashboard-empty hidden>ไม่พบ module ที่ตรงกับคำค้นหา</p>
+      {% else %}
+        <p class="up-empty-state">{% translate 'You don’t have permission to view or edit anything.' %}</p>
+      {% endif %}
+    </section>
+  </section>
+</div>
+{% endblock %}

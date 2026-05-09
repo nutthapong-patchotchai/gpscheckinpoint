@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == "edit" %}แก้ไขเคส{% else %}เพิ่มเคส{% endif %} | UP Checkin{% endblock %}
+
+{% block content %}
+  <section class="page-heading compact">
+    <p class="eyebrow">COVID tracing</p>
+    <h1>{% if mode == "edit" %}แก้ไขเคส{% else %}เพิ่มเคส COVID-19{% endif %}</h1>
+    <p>ถ้าไม่กำหนดช่วง timeline ระบบจะใช้ย้อนหลัง 14 วันจากวันที่เริ่มมีอาการหรือวันที่ตรวจพบ</p>
+  </section>
+
+  <section class="content-layout">
+    <form class="form-surface" method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>ข้อมูลเคส</h2>
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="{{ form.user.id_for_label }}">{{ form.user.label }}</label>
+            {{ form.user }}
+            {{ form.user.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+            {{ form.status }}
+            {{ form.status.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.symptom_started_on.id_for_label }}">{{ form.symptom_started_on.label }}</label>
+            {{ form.symptom_started_on }}
+            {{ form.symptom_started_on.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.confirmed_on.id_for_label }}">{{ form.confirmed_on.label }}</label>
+            {{ form.confirmed_on }}
+            {{ form.confirmed_on.errors }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title">
+          <h2>ช่วง Timeline</h2>
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="{{ form.trace_start_date.id_for_label }}">{{ form.trace_start_date.label }}</label>
+            {{ form.trace_start_date }}
+            {{ form.trace_start_date.errors }}
+          </div>
+          <div class="field">
+            <label for="{{ form.trace_end_date.id_for_label }}">{{ form.trace_end_date.label }}</label>
+            {{ form.trace_end_date }}
+            {{ form.trace_end_date.errors }}
+          </div>
+          <div class="field full-span">
+            <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+            {{ form.notes }}
+            {{ form.notes.errors }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="button primary" type="submit">บันทึกเคส</button>
+        {% if case %}
+          <a class="button secondary" href="{% url 'tracing_case_detail' case.pk %}">ยกเลิก</a>
+        {% else %}
+          <a class="button secondary" href="{% url 'tracing_dashboard' %}">ยกเลิก</a>
+        {% endif %}
+      </div>
+    </form>
+
+    <aside class="side-panel">
+      <h2>กติกาค้นหา contact</h2>
+      <ol class="timeline">
+        <li>
+          <strong>เสี่ยงสูง</strong>
+          <span>สถานที่เดียวกันหรือพิกัดใกล้มาก ภายใน 4 ชั่วโมง</span>
+        </li>
+        <li>
+          <strong>เสี่ยงกลาง</strong>
+          <span>สถานที่เดียวกันในวันเดียวกัน พิกัดใกล้ 250 เมตร หรืออยู่หอเดียวกัน</span>
+        </li>
+        <li>
+          <strong>เสี่ยงต่ำ</strong>
+          <span>อยู่ตำบลเดียวกันหรือพื้นที่ใกล้เคียงในวันเดียวกัน</span>
+        </li>
+      </ol>
+    </aside>
+  </section>
+{% endblock %}
